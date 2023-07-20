@@ -196,12 +196,19 @@ key-value对类型:Map.Entry<xxx,xxx> (xxx为数据类型)
 </details>
 
 ### 泛型
+
+<details>
+<summary> </summary>
+
+
 提高代码复用性
 
 **知识点**
 1. 泛型方法定义:修饰词 <T,E..> 返回类型 名字(参数)
 2. 泛型类:class 类名<T,E....>
 3. 泛型接口:inteface 接口名<T,E...>
+
+</details>
 
 ### GUI入门
 
