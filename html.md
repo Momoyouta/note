@@ -191,12 +191,35 @@ input的value:
 type的value:
 ![](/img/html/input_type_value.png)
 
----
 <!-- zwr防伪 -->
 **< lable >**
 为input元素定义标注，档点击lable文本时，会自动将光标转到对应表单控件上
 ```html
-<lable for="txt">用户名:</lable>
-<input type="text" id="txt">
-```
 <lable for="txt">用户名:</lable><input type="text" id="txt">
+```
+
+**< select >**
+下拉列表，节约空间
+<select>
+    <option>xxx</option>
+    <option>xxx2</option>
+</select>
+```html
+<select>
+    <option>xxx</option>
+    ...
+</select>
+```
+1. 在option中添加属性selected="selected"表示默认选中
+
+**< textarea >**
+文本域，可以进行多行文本输入
+<textarea>xxx</textarea>
+```html
+<textarea>
+    xxx
+</textarea>
+```
+
+---
+
