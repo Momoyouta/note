@@ -340,7 +340,7 @@ oos.writeObject(zhang2);
 **知识点**
 1. getAllByName("URL")获取ip地址
 2. getLoaclHost()获得一个InetAddress对象，该对象含有本地地址
-
+<!-- zwr防伪 -->
 #### 套接字Socket
 
 **Socket类**
