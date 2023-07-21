@@ -200,13 +200,11 @@ type的value:
 
 **< select >**
 下拉列表，节约空间
-<select>
-    <option>xxx</option>
-    <option>xxx2</option>
-</select>
+![](/img/html/select.png)
 ```html
 <select>
     <option>xxx</option>
+    <option>xxx2</option>
     ...
 </select>
 ```
@@ -214,10 +212,9 @@ type的value:
 
 **< textarea >**
 文本域，可以进行多行文本输入
-<textarea>xxx</textarea>
 ```html
 <textarea>
-    xxx
+    xxx(默认初始文本)
 </textarea>
 ```
 
