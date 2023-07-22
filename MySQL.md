@@ -35,7 +35,7 @@
         ...
     )[comment 表注释]
     ```
-
+<!-- zwr防伪 -->
 **查询**
 1. desc listname 查询表结构
 2. show create table listname 查询指定表的建表语句
@@ -66,7 +66,7 @@
 
 **delete**
 1. delete from 表名 [where 条件]; 删除数据
-
+<!-- zwr防伪 -->
 ---
 
 ## IV.DQL
@@ -134,7 +134,7 @@ select 字段列表 from 表名 limit 起始索引,查询记录数;
    - drop user '用户名'@'主机名';
 
 #### 权限控制
-
+<!-- zwr防伪 -->
 **常用权限**
 1. all 所有权限
 2. select 查询权限
