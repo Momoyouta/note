@@ -380,10 +380,34 @@ Naming.rebind(String name,Remote obj)远程服务调用服务器类方法
 </details>
 
 
-### 
+### 常用API
 
 <details>
 <summary> </summary>
+
+#### I.Math
+进行一些数学操作如max、向上取整等等,类似c中的math库
+
+#### II.System
+与系统相关的方法
+1. exit(0) 终止虚拟机，0表示正常停止
+2. long currentTimeMillis() 返回当前系统的时间毫秒值形式
+3. arraycopy  拷贝数组
+
+#### III.Object
+顶级父类,可以对其中方法进行重写
+1. String toString() 返回对象的字符串表现形式
+2. equals(Object obj) 比较两个对象是否相等
+3. clone 把A对象的属性值完全拷贝给B对象
+   - 在Object中clone是protect修饰，故子类对象想使用克隆得重写clone方法，通过super关键字调用父类clone方法实现子类对象克隆
+   - 子类实现Cloneable接口(标记性接口，接口中无方法)
+   - Object中clone为浅克隆，要实现深克隆需重写时写
+   - 一般实现深克隆使用第三方工具如gson
+
+#### IV.Ojects
+1. boolean equals 比较两个对象
+   - 底层会先判断两个对象是否为null，null则直接返回false
+2. boolean isNull 对象是否为空
 
 </details>
 
