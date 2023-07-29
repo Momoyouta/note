@@ -153,8 +153,119 @@ grant 权限列表 on 数据库名.表名 to '用户名'@'主机名';
 
 **3.撤销权限**
 revoke 权限列表 on 数据库名.表名 from '用户名'@'主机名';
+
 ---
 
+## VI.函数
+
+#### 字符串函数
+
+**常用函数**
+1. concat(s1,s2,...) 字符串拼接
+2. lower(str) 转为小写
+3. upper(str) 转为大写
+4. lpad(str,n,pad) 左填充，用字符串pad对str的左边进行填充，达到n个字符串长度
+5. rpad 右填充
+6. trim(str)  去字符串头部和尾部的空格
+7. substring(str,start,len) 返回从字符串str从start位置起的len个长度的字符串
+
+#### 数值函数
+类似java中math库
+**常用函数**
+1. ceil(x) 向上取整
+2. floor(x) 向下取整
+3. mod 求模
+4. rand() 返回0-1内的随机数,通过乘上一个数来达到取更多数的效果
+5. round(x,y) 求x四舍五入的值，保留y位小数
+
+#### 日期函数
+
+**常用函数**
+1. curdate() 返回当前日期
+2. curtime() 返回当前时间
+3. now() 返回当前日期和时间
+4. year(Date) 获取指定date年份
+5. month(date) 获取指定date月份
+6. dat(date)  获取指定date日期
+7. date_add(date interval expr type) 返回一个日期/时间值加上一个时间间隔expr后的时间值
+8. datediff(date1,date2) 返回起始时间date1和结束时间date2之间的天数
+
+#### 流程函数
+在SQL语句中实现条件筛选，提高语句的效率
+
+**常用函数**
+1. if(value,t,f) 如果value为true，则返回t，否则f
+2. ifnull(value1,value2) 如果value1不为空,返回value1,否则返回value2
+3. case when [val1] then [res1]... else [default] end 如果val1为true,返回res1,..否则返回default默认值
+4. case [expr] when [val1] then [res1] ... else[default] end 如果expr值等于val1，返回res1,...否则返回default默认值
+
+
+---
+
+## VII.约束
+作用于表中字段上的规则，用于限制存储在表中的数据   
+利用外键建立表之间的联系
+
+**表内约束**
+约束可以在建表时字段后直接添加
+```
+create table user2(
+    id int primary key auto_increment comment '主键',
+    ...
+)
+```
+也可以之后添加
+```
+alter table add 约束(被添加的字段)
+```
+同理可以用drop删除约束
+
+**外键添加**
+```
+alter table 表名 add constraint 外键名称 foreign key (被添加字段) references 主表(主表名);
+```
+**外键约束**
+1. cascade 当在父表删除/更新对应记录时,首先检查该记录是否有对应外键,有则也删除/更新外键在子表中的记录
+2. set null 当在父表删除对应记录时，首先检查该记录是否有对应外键，有则设置子表中该外键值为null
+3. restrict/no action 有对应外键，不允许更新删除
+```
+alter table 表名 add constraint 外键名称 foreign key (被添加字段) references 主表(主表名) on update/delete 约束;
+```
+
+---
+
+## VIII.多表查询
+
+### 链接查询
+
+#### 内连接
+查询交集部分数据
+
+
+#### 外连接
+选取左/右表，只查询左/右表以及交集部分数据
+==用于处理部分数据外键值为null导致多表查询时不显示问题==
+```sql
+select 字段列表 from 表1 left/right [outer] join 表2 on 条件..;
+```
+
+#### 自连接
+例子:学生进行了分组操作，需查询各学生的组长是谁(名字),而组长信息也在学生信息中,某学生的组长用id记录,此时就用到自链接
+```select 字段列表 from 表 别名a join 表 别名b on 条件...```
+外连接同样适用
+
+### 联合查询-union,union all
+把多次查询的结果合并起来，形成一个新的查询结果集
+多张表字段数以及类型必须保持一致
+```sql
+select 字段列表 from 表A...
+union [all]  -->加all会直接拼接结果,即可能出现重复数据
+select 字段列表 from 表B...
+
+```
+
+
+---
 <details>
 <summary> </summary>
 
