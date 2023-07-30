@@ -264,8 +264,60 @@ select 字段列表 from 表B...
 
 ```
 
+### 子查询(嵌套查询)
+查询已查询获得的信息(嵌套)
+#### 标量子查询
+```select * from user2 where user2.workplace_id=(select id from user where id=1);```
+
+#### 列子查询
+子查询的返回结果为一列
+
+**常用操作符**
+将where后条件'=' 替换为操作符  
+```select * from user2 where user2.maht > all (select math from user where id=1);```
+1. in 在指定集合范围内，多选一
+2. not in 不在指定的范围之内
+3. any/some 子查询返回列表中，有任意一个满足
+4. all 必须所有都满足
+
+#### 行子查询
+返回结果为一行
+常用操作符:in,<>,=,
+#### 表子查询
+返回结果为多行多列
+常用操作符:in
+
 
 ---
+
+## IX.事务
+
+### 事务操作 
+**查看事务提交方式**
+select @@autocommit
+**设置事物提交方式**
+set @@autocommit=0;
+1自动，0手动
+**提交事务**
+commit;
+**回滚事务**
+rollback;
+**开启事务**
+start transaction 或begin;
+
+### 事务隔离级别
+![](/img/MySQL/gl.png)
+**查看隔离级别**
+select @@transaction_isolation
+
+**设置隔离级别**
+set [session|global] tansaction isolation level {级别}
+
+
+
+
+---
+
 <details>
 <summary> </summary>
 
