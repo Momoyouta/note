@@ -313,10 +313,41 @@ select @@transaction_isolation
 **设置隔离级别**
 set [session|global] tansaction isolation level {级别}
 
+---
 
+## X.窗口函数
 
+**语法**
+```sql
+<窗口函数> oevr ([partition by <列清单>]
+                        [范围限定] order by <排序用列清单>)
+```
+
+**常见函数**
+1. 部分聚合函数(sum,avg,count,max,min)
+2. **rank()**  计算记录排序,如果存在相同的位次的记录,则会跳过之后的位次(两个第一名则第三个人为第三名)
+3. **dense_rank()**  计算记录排序,即使存在相同位次的记录,也不会跳过之后的位次(两个第一名,第三个人为第二名)
+4. **row_number()**  赋予唯一的连续位次(两个同分,分别为第一第二名)
+5. **lag(参数名,偏移位数,超出边界默认值)** 查询当前行向上偏移n行对应的结果 
+6. **lead(同lag)** 查询向下偏移n行结果
+
+**范围限定**
+1. rows 限定行
+利用rows(行)，preceding(之前),following(之后)关键字来限定范围
+```sql
+   rows between 1 preceding and 1 following
+   //表示当前行和前行和后一行
+```
+2. range 限定数值范围
+需通过order by确定关键字
+如限定日期
+```sql
+range interval 6 day preceding
+//限定近7天的值
+```
 
 ---
+
 
 <details>
 <summary> </summary>
