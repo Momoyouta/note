@@ -365,6 +365,29 @@ range interval 6 day preceding
 **匹配模式**
 <table data-draft-node="block" data-draft-type="table" data-size="normal"><tbody><tr><th>模式</th><th>匹配模式的什么</th><th>例子</th><th>含义</th></tr><tr><td>^</td><td>匹配字符串开头</td><td>select name from 表名 where name regexp &#39;^王&#39;</td><td>匹配姓为王的名字</td></tr><tr><td>$</td><td>匹配字符串结尾</td><td>select name from 表名 where name regexp &#39;明$&#39;</td><td>匹配名字最后一个字为明的名字</td></tr><tr><td>.</td><td>匹配任意字符</td><td>select name from 表名 where name regexp &#39;.明.&#39;</td><td>匹配带有明的名字</td></tr><tr><td>[…]</td><td>匹配方括号间列出的任意字符</td><td>select name from 表名 where name regexp &#39;^[wzs]&#39;;</td><td>匹配括号里任意字符的名字</td></tr><tr><td>[^…]</td><td>匹配方括号间未列出的任意字符</td><td>select name from 表名 where name regexp &#39;^[^wzs]&#39;;</td><td>匹配未在括号里任意字符的名字</td></tr><tr><td>p1|p2|p2</td><td>交替：匹配任意p1或p2或p3</td><td>select performance from 表名 where performance regexp &#39;A-|A|A+&#39;;</td><td>匹配p1,p2,p3</td></tr><tr><td>*</td><td>匹配前面的字符零次或者多次</td><td>str*&#39;</td><td>可以匹配st/str/strr/strrr……</td></tr><tr><td>?</td><td>匹配前面的字符零次或者1次</td><td>str?&#39;</td><td>可以匹配st/str</td></tr><tr><td>+</td><td>匹配前面的字符一次或者多次</td><td>str+&#39;</td><td>可以匹配str/strr/strrr/strrrr……</td></tr><tr><td>{n}</td><td>匹配前面的字符n次</td><td></td><td></td></tr><tr><td>{m,n}</td><td>匹配前面的字符m至n次</td><td></td><td></td></tr></tbody></table>
 
+---
+
+## XII.索引
+帮助数据库高效获取数据的==数据结构==
+
+#### 结构
+一般情况下为B+Tree(多路平衡搜索树)
+
+#### 语法
+- 创建索引
+  ```
+  create [unique] index 索引名 on 表名(字段名)
+  ```
+   会自动为主键和有unique约束的字段创建索引
+- 查看索引
+  ```
+  show index from 表名
+  ```
+- 删除索引
+  ```
+  drop index 索引名 on 表名
+  ```
+
 
 ---
 
