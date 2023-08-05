@@ -168,6 +168,8 @@ revoke 权限列表 on 数据库名.表名 from '用户名'@'主机名';
 5. rpad 右填充
 6. trim(str)  去字符串头部和尾部的空格
 7. substring(str,start,len) 返回从字符串str从start位置起的len个长度的字符串
+8. left/right(str,length) 从左/右截取字符串
+9. group_concat([distinct] 要连接的str [order by 排序字段] [separator '分隔符']) 连接字段
 
 #### 数值函数
 类似java中math库
@@ -248,6 +250,9 @@ alter table 表名 add constraint 外键名称 foreign key (被添加字段) ref
 ```sql
 select 字段列表 from 表1 left/right [outer] join 表2 on 条件..;
 ```
+**其他链接**
+1. 外链接:left join +right join
+   使用union all将两个JOIN合并
 
 #### 自连接
 例子:学生进行了分组操作，需查询各学生的组长是谁(名字),而组长信息也在学生信息中,某学生的组长用id记录,此时就用到自链接
@@ -348,6 +353,20 @@ range interval 6 day preceding
 
 ---
 
+## XI.正则表达式
+用于匹配字符,like是模糊匹配,而正则表达式则是准确匹配
+使用regexp关键字进行匹配
+**正则表达式函数**
+1. **regexp_like(str1,str2)** 匹配，返回1或0
+2. **regexp_instr** 包含
+3. **regexp_replace(str,匹配字符串,替换字符串)** 替换
+4. **regexp_substr(str,匹配字符串,位置)** 用于模式匹配,提取子串
+
+**匹配模式**
+<table data-draft-node="block" data-draft-type="table" data-size="normal"><tbody><tr><th>模式</th><th>匹配模式的什么</th><th>例子</th><th>含义</th></tr><tr><td>^</td><td>匹配字符串开头</td><td>select name from 表名 where name regexp &#39;^王&#39;</td><td>匹配姓为王的名字</td></tr><tr><td>$</td><td>匹配字符串结尾</td><td>select name from 表名 where name regexp &#39;明$&#39;</td><td>匹配名字最后一个字为明的名字</td></tr><tr><td>.</td><td>匹配任意字符</td><td>select name from 表名 where name regexp &#39;.明.&#39;</td><td>匹配带有明的名字</td></tr><tr><td>[…]</td><td>匹配方括号间列出的任意字符</td><td>select name from 表名 where name regexp &#39;^[wzs]&#39;;</td><td>匹配括号里任意字符的名字</td></tr><tr><td>[^…]</td><td>匹配方括号间未列出的任意字符</td><td>select name from 表名 where name regexp &#39;^[^wzs]&#39;;</td><td>匹配未在括号里任意字符的名字</td></tr><tr><td>p1|p2|p2</td><td>交替：匹配任意p1或p2或p3</td><td>select performance from 表名 where performance regexp &#39;A-|A|A+&#39;;</td><td>匹配p1,p2,p3</td></tr><tr><td>*</td><td>匹配前面的字符零次或者多次</td><td>str*&#39;</td><td>可以匹配st/str/strr/strrr……</td></tr><tr><td>?</td><td>匹配前面的字符零次或者1次</td><td>str?&#39;</td><td>可以匹配st/str</td></tr><tr><td>+</td><td>匹配前面的字符一次或者多次</td><td>str+&#39;</td><td>可以匹配str/strr/strrr/strrrr……</td></tr><tr><td>{n}</td><td>匹配前面的字符n次</td><td></td><td></td></tr><tr><td>{m,n}</td><td>匹配前面的字符m至n次</td><td></td><td></td></tr></tbody></table>
+
+
+---
 
 <details>
 <summary> </summary>
