@@ -49,6 +49,16 @@ public String simpleParam(User user){
    public String pathParam(@PathVariable Integer id,...){...}
    ```
 
+**常见注解**
+1. **RequestMapping**:将相同的路径进行提取
+2. **RequestParam()**:设置请求默认参数、绑定表单项
+3. **@PathVariable**:获取路径参数
+4. **@DateTimeFormat(pattern="")**:固定日期格式
+
+**常见API**
+1. **MultipartFile**:接受文件请求
+   - .transferTo(File dest) 将接收到的文件转存到磁盘
+   - .getOriginalFilename() 获取原始文件名
 
 #### 响应
 通过该类下的==HttpServletResponse==对象设置响应数据，再由tomcat响应，即响应对象
@@ -83,5 +93,9 @@ Client/Server，客户端/服务器架构模式，需要单独安装客户端
 使用@Autowired注解实现依赖注入
 使用@Primary或@Resource(name)实现容器优先选择
 
+
+---
+
+## IV.
 
 ---
