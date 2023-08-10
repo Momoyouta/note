@@ -96,6 +96,31 @@ Client/Server，客户端/服务器架构模式，需要单独安装客户端
 
 ---
 
-## IV.
+## IV.配置文件
+
+### 参数化配置
+- springboot封装了属性注入方法，借助注解可以实现外部配置属性注入
+```
+//application.properties中
+com.pptp.tmp=10
+```
+```
+//注入
+public class test(){
+    @Value("${com.pptp.tmp}")
+    private tmp;
+}
+```
+- 将类交给IOC容器管理结合@ConfigurationProperties(prefi="com.pptp")可以实现自动外部注入
+### yml配置
+- 与properties类型类似，但yml格式为层级嵌套
+  ```
+  //properties中
+  com.pptp.tmp=10
+  //yml中
+  com:
+    pptp:
+        tmp=10
+  ```
 
 ---

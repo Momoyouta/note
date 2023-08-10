@@ -23,9 +23,12 @@
 }
 ```
 
-### 云储存
+### 云储存-对象存储服务OSS
 
-
+#### 阿里云OSS
+- [简单文件上传](https://help.aliyun.com/zh/oss/developer-reference/simple-upload-11?spm=a2c4g.11186623.0.0.40a57a035F0Tpi)
+用前注意配置相关[依赖](https://help.aliyun.com/zh/oss/developer-reference/java-installation?spm=a2c4g.11186623.0.0.5dd64297ZvXi3n)以及[阿里云访问凭证](https://help.aliyun.com/zh/oss/developer-reference/oss-java-configure-access-credentials?spm=a2c4g.11186623.0.0.67204297m1MPUF#e0f7fac0fdcna)
+- 集成到案例中使用阿里云提供的工具类
 
 </details>
 
