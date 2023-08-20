@@ -77,7 +77,7 @@
 2. Payload：携带自定义信息、默认信息等
 3. Signature：防止Token被篡改、确保安全性。将header、payload，并加入指定密钥，通过指定签名算法计算而来
 
-**实现**
+**实现**<br/>
 调用Jwts工具类
 ```java
 public void jwtB() {
@@ -176,7 +176,7 @@ public class WebConfig implements WebMvcConfigurer {
 public class GlobalExceptionHandler {
     @ExceptionHandler(Exception.class)//设定捕获异常类型
     public Result ex(Exception ex){
-        ex.printStackTrace();;
+        ex.printStackTrace();
         return Result.error("操作失败");
     }
 }

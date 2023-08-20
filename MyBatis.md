@@ -30,3 +30,41 @@ JDBC:使用Java语言操作关系型数据库的一套API
    - **< include refid="name"/>**：将代码引用
 
 ---
+
+## Mybatis-Plus
+
+<details>
+<summary> </summary>
+
+内置Mapper、通用Service，封装了`单表`大部分CRUD操作
+
+ **依赖**
+需注意mp依赖中自带mybatis依赖，重复导入若版本不同会爆红
+```java
+<dependency>
+   <groupId>com.baomidou</groupId>
+   <artifactId>mybatis-plus</artifactId>
+   <version>3.5.3.2</version>
+</dependency>
+<dependency>
+   <groupId>com.baomidou</groupId>
+   <artifactId>mybatis-plus-boot-starter</artifactId>
+   <version>3.5.3.2</version>
+</dependency>
+
+```
+
+**入门**
+- 对于Mapper接口只需继承BaseMapper<User>,之后直接调用封装的CRUD操作
+  - [CRUD接口](https://baomidou.com/pages/49cc81/)
+- 对于条件查询，利用Wrapper条件构造器
+  - [条件构造器](https://baomidou.com/pages/10c804/#alleq)
+- 
+
+**快速链接**
+1. 
+2. [注解](https://baomidou.com/pages/223848/#tablename)
+
+
+</detils>
+
