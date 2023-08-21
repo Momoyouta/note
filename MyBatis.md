@@ -32,13 +32,13 @@ JDBC:使用Java语言操作关系型数据库的一套API
 ---
 
 ## Mybatis-Plus
-1111
+
 <details>
 <summary> </summary>
 
 内置Mapper、通用Service，封装了`单表`大部分CRUD操作
 
- **依赖**
+ **依赖**<br >
 需注意mp依赖中自带mybatis依赖，重复导入若版本不同会爆红
 ```java
 <dependency>
@@ -59,11 +59,10 @@ JDBC:使用Java语言操作关系型数据库的一套API
   - [CRUD接口](https://baomidou.com/pages/49cc81/)
 - 对于条件查询，利用Wrapper条件构造器
   - [条件构造器](https://baomidou.com/pages/10c804/#alleq)
-- 
+  
 
 **快速链接**
-1. 
-2. [注解](https://baomidou.com/pages/223848/#tablename)
+1. [注解](https://baomidou.com/pages/223848/#tablename)
 
 
 </detils>
