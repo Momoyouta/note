@@ -168,6 +168,7 @@ public class WebConfig implements WebMvcConfigurer {
 <summary> </summary>
 
 #### 全局异常处理器
+
 捕获所有异常
 
 **实现**
@@ -182,6 +183,69 @@ public class GlobalExceptionHandler {
 }
 ```
 
+
+</details>
+
+---
+
+## IV.JS数据处理精度丢失
+
+<details>
+<summary> </summary>
+例如对于Long型的19位id提交时与数据库中的不一致，原因是js对long型数据处理时丢失精度
+
+#### 解决方法
+在服务端给页面响应json数据时进行处理，将long型数据统一转为String字符串
+1. 提供对象转换器JacksonObjectMapper，基于Jackson进行java对象到json数据的转换
+2. 在WebMvcConfig配置类中扩展Spring mvc消息转换器，在此消息转换器中使用提供的对象转换器进行java对象到json数据的转换
+```java
+@Configuration
+public class WebMvcConfig extends WebMvcConfigurationSupport {
+    @Override
+    protected void extendMessageConverters(List<HttpMessageConverter<?>> converters) {
+        //创建消息转换器对象
+        MappingJackson2HttpMessageConverter messageConverter=new MappingJackson2HttpMessageConverter();
+        //设置对象转换器，底层使用Jackson将java对象转为json
+        messageConverter.setObjectMapper(new JacksonObjectMapper());
+        //将上面的消息转换器对象追加到mvc框架的转换器集合中
+        converters.add(0,messageConverter);
+    }
+}
+
+```
+
+</details>
+
+
+---
+
+## V.公共字段自动填充
+<details>
+<summary> </summary>
+
+例，在新增员工时都需要设置创建时间，这字段就属于公共字段，对于这些公共字段可以利用MybatisPlus提供的公共字段自动填充功能进行统一处理，简化开发<br />
+
+> [TableFill](https://baomidou.com/pages/223848/#fieldfill)
+
+#### 实现
+1. 在实体类属性上加入@TableField注解，指定自动填充策略
+2. 按照框架要求编写元数据对象处理器，在此类中统一为公共字段赋值，此类需要实现MetaObjectHandler接口
+
+#### 对于当前请求session获取
+利用ThreadLocal来维护线程中的变量，即Threadlocal为线程的局部变量
+Threadlocal存储在堆区
+| 方法                     | 作用                               |
+| ------------------------ | ---------------------------------- |
+| public void set(T value) | 设置当前线程的线程局部变量的值     |
+| public T get()           | 返回当前线程对应的线程局部变量的值 |
+
+</details>
+
+---
+
+
+<details>
+<summary> </summary>
 
 </details>
 
