@@ -243,16 +243,47 @@ Threadlocal存储在堆区
 
 ---
 
+## VI.MP处理分页多表查询方法
 
 <details>
 <summary> </summary>
+
+### 1.使用工具类连接，转为多次单表查询
+**情景再现**
+现有Student表与Teacher表，Student表中存有TeacherId但没有TeacherName,要求输出学生所有信息以及所属老师名
+
+**解决方法**
+- 对于前端请求数据，建立一个DTO类继承Student，在此基础上添加TeacherName成员变量，这样即可接受前端传来包含Student以及TeacherName的数据
+- 后端数据处理，构造Student与DTO的分页构造器对象stuPage、dtoPage，将stuPage中除records外的数据利用BeanUtils拷贝到dtoPage中(忽略records节省资源)，再根据stuPage中的records读取出teacherId进行对Teacher的单表查询，并将数据填入dtoPage中，最终返回dtoPage完成多表查询
+```java
+public R<Page> page(int page,int pageSize,String name){
+    Page<Student> pageInfo = new Page<>(page,pageSize);
+    Page<StuDto> stuDtoPgae=new Page<>();
+    LambdaQueryWrapper<Student> queryWrapper=new LambdaQueryWrapper<>();
+    queryWrapper.like(name!=null,Student::getName,name);
+    stuService.page(pageInfo,queryWrapper);
+    //对象拷贝,忽略records
+    BeanUtils.copyProperties(pageInfo,stuDtoPgae,"records");
+    List<Student> records = pageInfo.getRecords();
+    List<StuDto> list= records.stream().map((item)->{
+        StuDto stuDto=new StuDto();
+        BeanUtils.copyProperties(item,stuDto);
+        Long teacherId=item.getTeacherId();
+        Teacher teacher=TeacherService.getById(teacherId);//二次查询
+        String teacherName=teacher.getName();
+        stuDto.setTeacherName(teacherName);
+        return stuDto;
+    }).collect(Collectors.toList());
+    stuDtoPgae.setRecords(list);
+    return R.success(stuDtoPgae);
+}
+```
 
 </details>
 
 ---
 
+##
 
 <details>
 <summary> </summary>
-
-</details>

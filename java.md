@@ -411,6 +411,50 @@ Naming.rebind(String name,Remote obj)远程服务调用服务器类方法
 
 </details>
 
+### Stream流
+
+<details>
+<summary> </summary>
+
+java8提供的一种以声明的方式处理数据，例如：
+
+```java
+List<String> list =new ArrayList<>();
+list.add...
+...
+list.stream()
+   .filter(()->{
+      return name.length>3;
+   })
+   .forEach((String name)->{
+   sout(name);
+});//输出名字长度不超过3的名字
+
+```
+
+**常用方法**
+| 方法名  | 方法作用   | 方法种类 | 是否支持链式调用 |
+| ------- | ---------- | -------- | ---------------- |
+| count   | 统计个数   | 终结方法 | 否               |
+| forEach | 逐一处理   | 终结方法 | 否               |
+| filter  | 过滤       | 函数拼接 | 是               |
+| limit   | 取用前几个 | 函数拼接 | 是               |
+| skip    | 跳过前几个 | 函数拼接 | 是               |
+| map     | 映射       | 函数拼接 | 是               |
+| concat  | 组合       | 函数拼接 | 是               |
+
+
+</details>
+
+
+### 
+
+<details>
+<summary> </summary>
+
+</details>
+
+
 ### 
 
 <details>
