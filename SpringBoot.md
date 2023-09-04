@@ -91,7 +91,8 @@ Client/Server，客户端/服务器架构模式，需要单独安装客户端
 ### DI
 依赖注入，Dependecy Injection，简称DI。容器为应用程序提供运行时，所依赖的资源，称之为依赖注入
 使用@Autowired注解实现依赖注入
-使用@Primary或@Resource(name)实现容器优先选择
+使用@Primary或@Resource(name)实现容器优先选择<br />
+不使用注解的原始方法即创建xml配置文件配置bean，在应用中使用ApplicationContext类获取IOC容器，调用getBean方法来获取配置中的bean
 
 
 ---

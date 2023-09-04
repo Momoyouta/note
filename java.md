@@ -447,10 +447,23 @@ list.stream()
 </details>
 
 
-### 
+### Property类
 
 <details>
 <summary> </summary>
+
+**概念**<br/>
+property 表示一个持久的属性集，属性以key-value的形式存在，key与value都是字符串。
+搭配IO流可以实现数据永久化，加载程序配置信息，如Mybatis框架等
+
+**常用API**
+| 方法名                               | 作用               |
+| ------------------------------------ | ------------------ |
+| setProperty(String key,String value) | 设置一个键值对     |
+| getProperty(String key)              | 获取对应key的value |
+| store(OutputStream ops)              | 将数据永久化存储   |
+| load(InputStrem ips)                 | 绑定输入流         |
+
 
 </details>
 
