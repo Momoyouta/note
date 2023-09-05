@@ -468,6 +468,81 @@ property 表示一个持久的属性集，属性以key-value的形式存在，ke
 </details>
 
 
+### 代理模式
+
+<details>
+<summary> </summary>
+
+- 一种java设计模式，特征为代理类与委托类有同样接口
+- 代理类主要负责为委托类预处理消息、过滤消息、把消息发给委托类，以及事后处理消息等
+- 简单来说，访问实际对象时是通过代理对象来访问
+
+
+#### 静态代理
+将被代理类包装起来然后重新实现相同的方法，并且调用原方法时可在前后添加新的处理，如：
+```java
+public class User{//被代理类
+   public void say(){
+      System.out.println("Hello");
+   }
+}
+
+public class UserService extends User{//代理类
+   public void say(){
+      super.say();
+      System.out.println("world");
+   }
+}
+
+```
+
+#### 动态代理
+利用Proxy类创建代理对象<br />
+**实现**
+利用Proxy的newProxyInstance方法获取接口的代理对象
+```java
+public class ProxyUtil{
+   // newProxyInstance
+   // 参数1：指定一个类加载器
+   // 参数2：指定生成的代理长什么样(有哪些方法)
+   // 参数3：指定生成的代理干什么事
+   public static User createProxy(User user)
+   {
+      UserService usp= (UserService) Proxy.newProxyInstance(ProxyUtil.class.getClassLoader(),
+                  new Class[]{userService.class}, new InvocationHandler() {
+                     @Override
+                     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+                           if(method.getName().equals("say")){
+                              System.out.println("world");
+                           }//代理处理
+                           return method.invoke(user,args);
+                     }
+                  });
+      return usp;
+   }
+}
+
+
+
+```
+
+
+</details>
+
+### 
+
+<details>
+<summary> </summary>
+
+</details>
+
+### 
+
+<details>
+<summary> </summary>
+
+</details>
+
 ### 
 
 <details>

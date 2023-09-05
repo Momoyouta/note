@@ -99,6 +99,21 @@ public class MyAdvice {
 }//结果为在UserService所有方法执行前执行before方法
 ```
 
+### AOP工作流程
+本质就是Java的代理模式
+1. Spring容器启动
+2. 读取所有切面配置的切入点
+3. 初始化bean，判定bean对应的类中的方法是否匹配到任意切入点
+   - 匹配失败，创建对象
+   - 匹配成功，创建原始对象的代理对象
+4. 获取bean执行方法
+   - 获取bean，调用方法并执行，完成操作
+   - 获取的bean是代理对象时，根据代理对象的运行模式运行原始方法与增强内容
+
+### 切入点表达式
+`"execution(void com.pptp.service.UserService.*())"`<br/>
+>格式 动作关键词(访问修饰符 返回值 包名.类/接口名.方法名(参数) 异常名)
+
 
 </details>
 
