@@ -123,6 +123,113 @@ public class MyAdvice {
 
 ---
 
+## IV.事务管理
+
+<details>
+<summary> </summary>
+
+### Spring事务管理
+- 在业务层接口上添加Spring事务管理@Transactional
+- 设置事务管理器
+  ```java
+    @Bean
+    public PlatformTransactionManager transactionManager(DataSource dataSource){
+        DataSourceTransactionManager transactionManager=new DataSourceTransactionManager();
+        transactionManager.setDataSource(dataSource);
+        return transactionManager;
+    }
+  ```
+- 在springconfig中使用@EnableTransactionManagement开启事务驱动
+
+
+
+### 事务属性
+![](/img/SSM/Transational_value.png)
+
+**事务传播行为**
+![](/img/SSM/transational_spread.png)
+
+</details>
+
+
+---
+
+## V.SpringMVC
+
+<details>
+<summary> </summary>
+
+一种基于Java实现MVC模型的轻量级Web框架
+
+**依赖**
+```
+<dependency>
+    <groupId>javax.servlet</groupId>
+    <artifactId>javax.servlet-api</artifactId>
+    <version>3.1.0</version>
+</dependency>
+<dependency>
+    <groupId>org.springframework</groupId>
+    <artifactId>spring-webmvc</artifactId>
+    <version>6.0.11</version>
+</dependency>
+```
+
+**容器初始化**
+```java
+//定义一个servlet容器启动的配置类
+public class ServletContainersinitConfig extends AbstractDispatcherServletInitializer {
+
+    //加载springMVC容器配置
+    @Override
+    protected WebApplicationContext createServletApplicationContext() {
+        AnnotationConfigWebApplicationContext ctx= new AnnotationConfigWebApplicationContext();
+        ctx.register(SpringMvcConfig.class); //注册容器
+        return ctx;
+    }
+
+    //设置归属springMVC处理的请求
+    @Override
+    protected String[] getServletMappings() {
+        return new String[]{"/"};
+    }
+
+    //加载spring容器配置
+    @Override
+    protected WebApplicationContext createRootApplicationContext() {
+        return null;
+    }
+}
+
+```
+
+</details>
+
+
+
+---
+
+## VI.SSM整合
+
+<details>
+<summary> </summary>
+
+**框架搭建**
+- SpringConfig
+  - JdbcConfig：配置数据库连接池
+    - 利用properties文件设置
+  - MybatisConfig
+    - 创建SqlSessionFactoryBean，配置dataSource、类型(pojo)包
+    - 创建MapperScannerConfigurer配置映射扫描(dao层)
+  - 导入配置，配置扫描区域
+- SpringMvcConfig
+  - ServletConfig servlet容器启动的配置类
+</details>
+
+
+
+---
+
 
 
 <details>
@@ -130,6 +237,15 @@ public class MyAdvice {
 
 </details>
 
+
+---
+
+
+
+<details>
+<summary> </summary>
+
+</details>
 
 ---
 
