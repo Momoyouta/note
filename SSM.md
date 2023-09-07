@@ -224,6 +224,10 @@ public class ServletContainersinitConfig extends AbstractDispatcherServletInitia
   - 导入配置，配置扫描区域
 - SpringMvcConfig
   - ServletConfig servlet容器启动的配置类
+
+### 拦截器/过滤器
+>详情见JavaWeb实际问题
+
 </details>
 
 
