@@ -283,7 +283,70 @@ public R<Page> page(int page,int pageSize,String name){
 
 ---
 
+## VII.Swagger
+
+<details>
+<summary> </summary>
+用于生成接口文档以及在线接口调试页面
+
+**Knife4j**
+为JavaMVC框架集成Swagger生成API文档的增强解决方案
+```xml
+<dependency>
+    <groupId>com.github.xiaoymin</groupId>
+        <artifactId>knife4j-openapi3-jakarta-spring-boot-starter</artifactId>
+    <version>4.1.0</version>
+</dependency>
+```
+
+**yml配置**
+```yml
+#springdoc相关配置
+springdoc:
+    swagger-ui:
+    path: /swagger-ui.html
+    tags-sorter: alpha
+    operations-sorter: alpha
+    api-docs:
+    path: /v3/api-docs
+    group-configs:
+    - group: 'hyc'
+        paths-to-match: '/**'
+        packages-to-scan: com.sky
+
+#knife4j相关配置 可以不用改
+knife4j:
+    enable: true
+    setting:
+    language: zh_cn
+```
+
+**注解**
+|注解|注解位置|作用|
+|-|-|-|
+|@Tag(name = "")|Controller类上||
+|@Operation(summary = "")|Controller方法上||
+|@Parameters|Controller方法上||
+|@Parameter(description = "")|Controller方法上@Parameters里||
+|@Parameter(hidden = true) 或 @Operation(hidden = true) 或 @Hidden|-||
+|@Schema|DTO类上 或 DTO 属性上||
+
+</details>
+
+---
+
 ##
 
 <details>
 <summary> </summary>
+
+</details>
+
+---
+
+##
+
+<details>
+<summary> </summary>
+
+</details>
