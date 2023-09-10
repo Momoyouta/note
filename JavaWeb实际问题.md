@@ -322,23 +322,35 @@ knife4j:
 ```
 
 **注解**
-|注解|注解位置|作用|
-|-|-|-|
-|@Tag(name = "")|Controller类上||
-|@Operation(summary = "")|Controller方法上||
-|@Parameters|Controller方法上||
-|@Parameter(description = "")|Controller方法上@Parameters里||
-|@Parameter(hidden = true) 或 @Operation(hidden = true) 或 @Hidden|-||
-|@Schema|DTO类上 或 DTO 属性上||
+| 注解                                                              | 注解位置                      | 作用                 |
+| ----------------------------------------------------------------- | ----------------------------- | -------------------- |
+| @Tag(name = "")                                                   | Controller类上                | 对类的说明           |
+| @Operation(summary = "")                                          | Controller方法上              | 说明方法的用途、作用 |
+| @Parameters                                                       | Controller方法上              | 指定多个参数描述     |
+| @Parameter(description = "")                                      | Controller方法上@Parameters里 | 描述参数信息         |
+| @Parameter(hidden = true) 或 @Operation(hidden = true) 或 @Hidden | -                             | 隐藏属性             |
+| @Schema                                                           | DTO类上 或 DTO 属性上         | 描述属性信息         |
 
 </details>
 
 ---
 
-##
+## VIII.数据格式处理
 
 <details>
 <summary> </summary>
+
+**例子**  
+对日期进行统一格式
+- 方法一：使用@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")来格式化数据
+- 方法二：使用Spring MVC的消息转换器,与处理JS精度丢失方法相同
+
+### Spring MVC消息转换器
+实现WebMvcConfigurer的extendMessageConverters方法  
+若集成Knife4j开发，注意注册ByteArrayHttpMessageConverter消息转换器，详情见
+>[引用文章](https://blog.loverorien.com/archives/knife4j-document-request-error)
+
+
 
 </details>
 
