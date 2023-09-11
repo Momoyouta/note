@@ -239,6 +239,47 @@ Threadlocal存储在堆区
 | public void set(T value) | 设置当前线程的线程局部变量的值     |
 | public T get()           | 返回当前线程对应的线程局部变量的值 |
 
+### SpringBoot实现
+- 自定义AutoFill注解，用于表示需要进行公共字段填充的方法
+  ```java
+  @Target(ElementType.METHOD)
+  @Retention(RetentionPolicy.RUNTIME)
+  public @interface AutoFill {
+  //OperationType为枚举体
+  OperationType value();
+  }
+  ```
+-  自定义切面类AutoFillAspect，统一拦截加入AutoFill的方法
+  ```java
+    @Aspect
+    @Component
+    public class AutoFillAspect {
+        @Pointcut("execution(xxx) && @annotation(xxx.AutoFill)")
+        public void autoFillPointCut(){}
+
+        @Before(value = "autoFillPointCut()")
+        public void autoFill(JoinPoint joinPoint){
+            //获取当前被拦截方法的操作类型
+            MethodSignature methodSignature=(MethodSignature) joinPoint.getSignature();//方法签名对象
+            AutoFill autoFill=methodSignature.getMethod().getAnnotation(AutoFill.class);//获得方法上的注解对象
+            OperationType operationType=autoFill.value();
+            //获取当前被拦截方法的参数
+            Object[] args = joinPoint.getArgs();
+            if(args == null ||args.length==0){
+                return;
+            }
+            Object entity=args[0];
+            //准备赋值数据
+            ...
+            //根据不同操作类型，为对应属性通过反射赋值
+            if(operationType==OperationType.xxx){
+                
+            }
+        }
+    }
+
+  ```
+
 </details>
 
 ---
