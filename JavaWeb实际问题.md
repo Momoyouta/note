@@ -397,6 +397,110 @@ knife4j:
 
 ---
 
+## IX.HttpClient
+
+<details>
+<summary> </summary>
+
+- HttpClient是Apache Jakarta Common下的子项目，可以用来提供高效的、最新的、功能丰富的支持HTTP协议的客户端编程工具包，©它支持HTPP协议最新的版本
+
+**依赖**
+```xml
+<dependency>
+    <groupId>org.apache.httpcomponents</groupId>
+    <artifactId>httpclient</artifactId>
+    <version>4.5.13</version>
+</dependency>
+```
+
+**发送请求步骤**
+- 创建HttpClient对象
+- 创建Http请求对象
+- 调用HttpClient的execute方法发送请求
+```java
+@Test
+public void testGet() throws IOException {
+    //创建httpclient对象
+    CloseableHttpClient httpClient = HttpClients.createDefault();
+    //创建请求对象
+    HttpGet httpGet = new HttpGet("http://localhost:8080/user/shop/status");
+    //发送请求，接受响应结果
+    CloseableHttpResponse response = httpClient.execute(httpGet);
+    //获取服务端返回的状态码
+    System.out.println(response.getStatusLine().getStatusCode());
+
+    HttpEntity entity=response.getEntity();
+    String body= EntityUtils.toString(entity);
+    System.out.println(body);
+
+    //关闭资源
+    response.close();
+    httpClient.close();
+}
+
+@Test
+public void testPOST() throws IOException {
+    CloseableHttpClient httpClient=HttpClients.createDefault();
+    HttpPost httpPost=new HttpPost("http://localhost:8080/admin/employee/login");
+    //设置请求参数
+    JSONObject jsonObject=new JSONObject();
+    jsonObject.put("username","admin");
+    jsonObject.put("password","123456");
+    StringEntity stringEntity=new StringEntity(jsonObject.toString());
+    //指定请求编码方式
+    stringEntity.setContentEncoding("utf-8");
+    stringEntity.setContentType("application/json");
+    httpPost.setEntity(stringEntity);
+    //发送请求
+    CloseableHttpResponse response = httpClient.execute(httpPost);
+    System.out.println(EntityUtils.toString(response.getEntity()));
+    //关闭资源
+    response.close();
+    httpClient.close();
+}
+```
+ 
+</details>
+
+---
+
+## X.缓存
+
+<details>
+<summary> </summary>
+
+- 当数据都是通过查询数据库获得，当用户端访问量比较大时，数据库访问压力随之增大
+
+**数据一致性**
+- 缓存需及时清理以保持与数据库数据一致
+
+### Redis解决
+- 可通过Redis来缓存数据，减少数据库查询操作
+
+
+### Spring Cache
+- SpringCache实现了基于注解的缓存功能，只需要简单地加一个注解，就能实现缓存功能
+- SpringCache提供了一层抽象，底层可以切换不同的缓存实现，例如：
+  - EHCache
+  - Caffeine
+  - Redis
+
+**Maven坐标**
+```xml
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-cache</artifactId>
+</dependency>
+```
+
+**常用注解**
+![](/img/SpringCache_@.png)
+
+
+</details>
+
+---
+
 ##
 
 <details>

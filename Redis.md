@@ -172,6 +172,13 @@ SpringData时Spring中数据操作模块，包含对各种数据库的集成，�
 - 提供了RedisTemplate统一API来操作Redis
 - 支持基于JDK、JSON、字符串、spring对象的数据序列号以及反序列化
 
+**操作步骤**
+1. 导入依赖
+2. 配置Redis数据源
+3. 编写配置类，创建RedisTemplate对象
+4. 通过RedisTeamlate对象操作Redis
+
+
 **依赖**
 <details>
 <summary> </summary>
@@ -215,6 +222,22 @@ spring:
 ```
 
 </details>
+
+### 初始化配置类
+```java
+@Configuration
+public class RedisConfiguration {
+    public RedisTemplate redisTemplate(RedisConnectionFactory redisConnectionFactory){
+        RedisTemplate redisTemplate=new RedisTemplate<>();
+        //设置redis的连接工厂对象
+        redisTemplate.setConnectionFactory(redisConnectionFactory);
+        //设置redis key序列化器
+        redisTemplate.setKeySerializer(new StringRedisSerializer());
+        return  redisTemplate;
+    }
+}
+
+```
 
 
 ### RedisTemplate工具类
