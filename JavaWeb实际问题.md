@@ -501,6 +501,59 @@ public void testPOST() throws IOException {
 
 ---
 
+## XI.Spring Task
+
+<details>
+<summary> </summary>
+
+- Spring提供的任务调度工具，可以按照约定的时间自动执行某个代码逻辑
+
+### cron表达式
+- cron表达式其实就是一个字符串，通过cron表达式来定义任务触发时间
+- 构成规则：分为6或7个域，由空格分隔，每个域代表一个定义
+- 每个域的含义分别为：秒，分钟，小时，日，月，周，年(可选)
+- 例如：22年10月12日上午9点整cron表达式为`0 0 9 12 10 ? 2022`
+  [cron生成器](https://cron.qqe2.com/)
+
+</details>
+
+---
+
+## XII.WebSocket
+
+<details>
+<summary> </summary>
+
+- WebSocket是一种基于TCP的一种新网络协议。它实现了浏览器与服务器全双工通信--浏览器和服务器只需要完成一次握手，两者之间就可以创建持久性的连接，并进行双向数据传输
+  
+**与HTTP的区别**
+- HTTP是短连接，WebSocket是长连接
+- HTTP通信是单向的，基于请求响应模式，而WebSocket是双向的
+
+**依赖**
+```xml
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-websocket</artifactId>
+</dependency>
+```
+
+
+</details>
+
+
+---
+
+##
+
+<details>
+<summary> </summary>
+
+</details>
+
+
+---
+
 ##
 
 <details>
