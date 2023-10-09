@@ -290,12 +290,10 @@ mongoTemplate.updateFirst(Query query,Update update,Class<?> entityClass)
 
 ---
 
-## V.MongoDB集群和安全
+## V.副本集-Replica Sets
 
 <details>
 <summary> </summary>
-
-### 副本集-Replica Sets
 
 > 副本集是一组维护相同数据集的mongod服务，副本集可以提供冗余和高可用性，是所有生产部署的基础。
 >  也可以说，副本集类似于有自动故障恢复功能的主从集群。通俗的讲就是用多台机器进行同一数据的异步同步，从而使多台机器拥有同一数据的多个副本，并且当主库当掉时在不需要用户干预的情况下自动切换其他备份服务器做主库。而且还可以利用副本服务器做只读服务器，实现读写分离，提高负载
@@ -365,7 +363,7 @@ replication:
 > 
 - ` rs.add(host,arbiterOnly)`
 - `rs.add("ip")`
-- `rs.addArb("ip")`或第一条均可添加仲裁节点
+- `rs.addArb("ip")`或第一条均可添加仲裁节点  
 | 参数        | 类型               | 描述                                                                                                                                                                                                        |
 | ----------- | ------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | host        | string or document | 要添加到副本集的新成员。指定为字符串或配置文档:1)如果是一个字符串，则需要指定新成员的主机名和可选的端口号;2)如果是一个文档，请指定在members数组中找到的副本集成员配置文档。必须在成员配置文档中指定主机字段 |
@@ -386,6 +384,94 @@ replication:
 
 ```
 
+### 主节点的选举原则
+MongoDB在副本集中，会自动进行主节点的选举，主节点选举的触发条件：
+- 主节点故障
+- 主节点网络不可达
+- 人工干预(rs.stepDown(600))
+
+**选举规则**
+- 票数最高，且获得了“大多数”成员的投票支持的节点获胜。
+> “大多数”定义为：假设复制集内投票成员数量为N，则大多数为N/2+1。当复制集内存活成员数量不足大多数时，整个复制集将无法选举出Primary，复制集将无法提供写服务，处于只读状态
+- 若票数相同，且获得了大多数成员的投票支持，数据新的节点获胜
+- 在获得票数时，优先级参数影响重大，通过设置优先级可以获得额外票数
+
+### SpringDataMongoDB连接副本集
+修改配置文件，数据源配置采用uri
+```
+mongodb://host1,host2,host3,.../arti?connect=replicaSet&slaveOK=true&replicaSet=副本集名字
+```
+
+
+
+</details>
+
+
+---
+
+## VI.分片集群-Sharded Cluster
+
+<details>
+<summary> </summary>
+
+**概述**
+- 分片是一种跨多台机器分布数据的方法，MongoDB使用分片来支持具有非常大的数据集和高吞吐量操作
+- 分片是指将数据拆分，将其分散存在不同的机器上的过程。有时也用分区来表示这个概念。将数据分散到不同机器上，不需要功能强大的大型计算机就可以存储更多的数据，处理更多的负载
+- 具有大型数据集或高吞吐量应用程序的数据库系统可以会挑战单个服务器的容量。例如，高查询率会耗尽服务器的CPU容量。工作集大小大于系统的RAM会强调磁盘驱动器的I/O容量
+> 有两种解决系统增长的方法：垂直扩展和水平扩展
+> 垂直扩展意味着增加单个服务器的容量，如使用更强大的CPU，添加更多RAM或增加存储空间量。可用技术的局限性可能会限制单个机器对于给定工作负载。结果，垂直缩放有实际的最大值。
+> 水平扩展意味着划分系统数据集并加载多个服务器，添加其他服务器可以根据需要增加容量。虽然单个机器的总体速度或容量可能不高，但每台机器处理整个工作负载的子集，可能提供比单个高速大容量服务器更高的效率。扩展部署容量只需要根据添加额外的服务器，这可能比单个机器的高端硬件的总体成本更低。权衡使基础架构和部署维护的复杂性增加
+
+**分片集群包含的组件**
+- 分片：每个分片包含分片数据的子集。每个分片都可以部署为副本集
+- 路由(mongos)：mongos充当查询路由器，在客户端应用程序和分片集群之间提供接口
+- config servers调度配置：配置服务器存储群集的元数据和配置设置。
+![](/img/MongoDB/Sharded_Cluster.png)
+
+### 分片集群架构
+![](/img/MongoDB/Sharded_Cluste2.png)
+
+### 分片集群搭建
+第一套副本集
+```
+mkdir -p ./mongodb/sharded_cluster/myshardrs01_27018/log \ &
+mkdir -p ./mongodb/sharded_cluster/myshardrs01_27018/data/db \ &
+
+mkdir -p ./mongodb/sharded_cluster/myshardrs01_27118/log \ &
+mkdir -p ./mongodb/sharded_cluster/myshardrs01_27118/data/db \ &
+
+mkdir -p ./mongodb/sharded_cluster/myshardrs01_27218/log \ &
+mkdir -p ./mongodb/sharded_cluster/myshardrs01_27218/data/db 
+```
+配置文件  
+`vim ./mongodb/sharded_cluster/myshardrs01_27018/mongod.conf`  
+
+```conf
+systemLog:
+  destination: file
+  path: "/usr/local/mongodb/sharded_cluster/myshardrs01_27018/log/mongod.log"
+  logAppend: true
+storage:
+  dbPath: "/usr/local/mongodb/sharded_cluster/myshardrs01_27018/data/db"
+  journal:
+    enabled: true
+processManagement:
+  fork: true
+net:
+  bindIp: localhost,192.168.52.129
+  #端口
+  port: 27018
+replication:
+  #副本集名称
+  replSetName: myshardrs01
+sharding:
+  #分片角色
+  clusterRole: shardsvr
+```
+- 类似的依照结构图创建该分片的从节点，端口分别为27118，27218
+- 启动并设置第一套副本集：一主一副本一仲裁
+- 同理设置第二套副本集、配置节点副本集
+
 
 </details>
 
@@ -400,7 +486,6 @@ replication:
 
 </details>
 
-
 ---
 
 ## 
@@ -421,7 +506,13 @@ replication:
 
 </details>
 
----
+## 
+
+<details>
+<summary> </summary>
+
+
+</details>
 
 ## 
 
