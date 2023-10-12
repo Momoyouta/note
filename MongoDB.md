@@ -474,9 +474,191 @@ sharding:
 - 启动并设置第一套副本集：一主一副本一仲裁
 - 同理设置第二套副本集、配置节点副本集
 
+路由节点  
+路由节点不需要存储具体数据，使用mongos服务，其他创建相同
+```
+mkdir -p ./mongodb/sharded_cluster/mymongos_27017/log 
+vim ./mongodb/sharded_cluster/mymongos_27017/mongos.conf
+```
+config文件中需指定配置节点副本集,路由器无副本集名字
+```
+sharding:
+  #指定配置节点副本集
+  configDB: myconfigrs/192.168.52.129:27019,192.168.52.129:27119,192.168.52.129:27129
+```
+
+- 创建好路由节点后需将分片添加进路由中  
+
+添加分片  
+`rs.addShard("分片名称/ip:port,ip2:pory...")`  
+
+开启分片  
+```
+sh.enableSharding("库名")
+```
+
+集合分片  
+`sh.shardCollection(namespace,key,unique)`  
+`sh.shardCollection("库名.集合名",{"key":1})`
+|参数|类型|描述|
+|-|-|-|
+|namespace|string|分片共享的目标集合的命名空间|
+|key|document|用作分片建的索引规范文档，由包含字段和该字段的索引遍历方向的文档组成|
+|unique|boolean|当为true时，片键字段上回限制为确保是唯一索引。哈希策略片键不支持唯一索引|
+
+**片键(Shard Key)**
+- 片键是每条记录都必须包含的，且建立了索引的单个字段或复合字段
+- MongoDB按照片键将数据划分到不同的数据块中，并将数据块均衡的分布到所有分片中
+- 分片方式：
+  - 基于哈希的随机平均分配
+  - 基于范围的数值大小分配
+    - 数据库(chunk)未被填满时不会分片
+
+### SpringDataMongoDB连接分片集群
+连接路由，通过路由控制即可
+```yml
+spring:
+  data:
+    mongodb:
+    uri: mongodb://192.168.52.129:27017,192.168.52.129:27117/articledb
+```
+
+
 
 </details>
 
+
+---
+
+## VII.安全认证
+
+<details>
+<summary> </summary>
+
+**简介**
+- 默认情况下，MongoDB实例启动运行时是没有启用用户访问权限控制的，也就是说，在实例本机服务
+器上都可以随意连接到实例进行各种操作，MongoDB不会对连接客户端进行用户验证，这是非常危险
+的
+- 为了保障安全可以：
+  - 默认情况下，MongoDB实例启动运行时是没有启用用户访问权限控制的，也就是说，在实例本机服务
+    器上都可以随意连接到实例进行各种操作，MongoDB不会对连接客户端进行用户验证，这是非常危险
+    的
+  - 开启安全认证。认证要同时设置服务器之间的内部认证方式，同时要设置客户端连接到集群的账号
+    密码认证方式
+- 为了强制开启用户访问控制(用户验证)，则需要在MongoDB实例启动时使用选项 --auth 或在指定启动
+配置文件中添加选项 auth=true   
+
+1. 启用访问控制：
+     - MongoDB使用的是基于角色的访问控制(Role-Based Access Control,RBAC)来管理用户对实例的访问。
+通过对用户授予一个或多个角色来控制用户访问数据库资源的权限和数据库操作的权限，在对用户分配
+角色之前，用户无法访问实例
+2. 角色：
+      - 在MongoDB中通过角色对用户授予相应数据库资源的操作权限，每个角色当中的权限可以显式指定，
+也可以通过继承其他角色的权限，或者两都都存在的权限
+3. 权限：
+      - 权限由指定的数据库资源(resource)以及允许在指定资源上进行的操作(action)组成
+        - 资源包括：数据库、集合、部分集合和集群
+        - 操作包括：对资源的CRUD操作
+      -  在角色定义时可以包含一个或多个已存在的角色，新创建的角色会继承包含的角色所有的权限。在同一
+      个数据库中，新创建角色可以继承其他角色的权限，在 admin 数据库中创建的角色可以继承在其它任意
+      数据库中角色的权限。
+- 角色权限查看：
+```
+// 查询所有角色权限(仅用户自定义角色)
+> db.runCommand({ rolesInfo: 1 })
+// 查询所有角色权限(包含内置角色)
+> db.runCommand({ rolesInfo: 1, showBuiltinRoles: true })
+// 查询当前数据库中的某角色的权限
+> db.runCommand({ rolesInfo: "<rolename>" })
+// 查询其它数据库中指定的角色权限
+> db.runCommand({ rolesInfo: { role: "<rolename>", db: "<database>" } }
+// 查询多个角色权限
+> db.runCommand(
+  {
+    rolesInfo: [
+    "<rolename>",
+    { role: "<rolename>", db: "<database>" },
+    ...
+    ]
+  }
+)
+```
+![](/img/MongoDB/chmod.png)
+
+### 单例环境
+**创建用户以及常用命令**
+- 切到admin库
+- 创建命令:`db.createUser({user:"name",pwd:"pwd",roles:[{"role":"root..","db":"dbname"}]})`
+  |参数|描述|
+  |-|-|
+  |role|角色(权限)|
+  |db|管理的库,默认所有库|
+- `db.system.users.find()`：查看已创建用户情况
+- `db.dropUser("name)`：删除用户
+- `db.changeUserPassword("myroot","123456")` 修改密码
+
+
+**开启认证**
+1. 启动时添加`--auth`
+   ```
+   /usr/local/mongodb/bin/mongod -f /mongodb/single/mongod.conf --auth
+   ```
+2. 配置文件中添加参数
+   ```
+   security:
+    authorization: enabled
+   ```
+- `db.auth("name","pwd")`：登录认证
+
+**springData连接**
+修改配置文件
+```yml
+mongodb:
+  username: name
+  password: 123456
+  #或uri: mongodb://name:pwd@ip:port/db
+```
+
+### 副本集环境
+- 对副本集执行访问控制需要配置以下方面：
+  - 副本集和共享集群的各个节点成员之间使用内部身份验证，可以使用密钥文件或x.509证书。密钥文
+件比较简单，本文使用密钥文件，官方推荐如果是测试环境可以使用密钥文件，但是正式环境，官方推
+荐x.509证书。原理就是，集群中每一个实例彼此连接的时候都检验彼此使用的证书的内容是否相同。
+只有证书相同的实例彼此才可以访问
+  - 使用客户端连接到mongodb集群时，开启访问授权。对于集群外部的访问。如通过可视化客户端，
+或者通过代码连接的时候，需要开启授权
+  - 在keyfile身份验证中，副本集中的每个mongod实例都使用keyfile的内容作为共享密码，只有具有正确
+密钥文件的mongod或者mongos实例可以连接到副本集。密钥文件的内容必须在6到1024个字符之
+间，==并且在unix/linux系统中文件所有者必须有对文件至少有读的权限==  
+
+除了创建key环境,其他步骤基本与单实例相同,在这里简单介绍key相关
+
+**1.创建副本集认证key文件**  
+生成密钥方法很多，例如，以下操作用openssl生成密码文件，然后使用chmod来更改文件程序，仅为文件所有者提供读取权限
+```
+openssl rand -base64 90 -out ./mongo.keyfile
+chmod 400 ./mongo.keyfile
+```
+- 提示：
+  - 所有副本集节点都必须要用同一份keyfile，一般是在一台机器上生成，然后拷贝到其他机器上，且必须
+有读的权限
+  - 一定要保证密钥文件一致，文件位置随便。但是为了方便查找，建议每台机器都放到一个固定的位置，
+都放到和配置文件一起的目录中
+
+**2.修改配置文件指定keyfile**  
+编辑conf文件
+```
+security:
+  keyFile: /mongodb/...../mongo.keyfile
+  authorization: enabled
+```
+
+springData连接副本集与单例类似,添加username和pwd即可
+
+分片集群认证和副本集一直
+
+
+</details>
 
 ---
 
@@ -488,38 +670,3 @@ sharding:
 
 </details>
 
----
-
-## 
-
-<details>
-<summary> </summary>
-
-
-</details>
-
----
-
-## 
-
-<details>
-<summary> </summary>
-
-
-</details>
-
-## 
-
-<details>
-<summary> </summary>
-
-
-</details>
-
-## 
-
-<details>
-<summary> </summary>
-
-
-</details>
