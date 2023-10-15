@@ -160,6 +160,9 @@ server:
   port: 8081 #########
 
 ```
+#### 3.5 Interface
+因为需要将provider和consumer拆分成独立模块，故两者不能有依赖，则需一个端口模块来存放公共端口
+
 </details>
 
 ---
