@@ -299,7 +299,8 @@ channel.queueBind(queue2Name,exchangeName,"warning");
 ### 4.4 Topics 通配符模式
 ![](/img/RabbitMQ/Topics.png)
 - 能实现Pub/Sub和Routing模式的功能，至少Topic在配置routingKey时可以使用通配符，更加灵活  
-通配符规则
+通配符规则  
+
 |符号|规则|示例|
 |-|-|-|
 |*|匹配一个单词|`pptp.*`将匹配`pptp.a`、`pptp.b`|
@@ -340,6 +341,7 @@ spring:
 
 #### 5.1.1 简单样例
 - SpringAMQP提供了RabbitTemplate工具类，方便我们发送消息
+> 该样例队列用图形页面添加  
 
 **发送消息**
 ```java
@@ -354,6 +356,7 @@ void testSimpleQueue() {
     String message = "hello rabbitmq";
     // 发送
     rabbitTemplate.convertAndSend(queueName,message);
+    //rabbitTemplate.convertAndSend(exchangeName,routingKey,message);
 }
 ```
 **接收消息**
@@ -365,6 +368,47 @@ public class SpringRabbitListener {
     public void listenSimpleQueue(String msg){
         System.out.println(msg);
     }
+}
+```
+
+#### 5.1.2 队列与交换机声明
+SpringAMQP提供了几个类，用来声明队列、交换机及其绑定关系
+- Queue：用于声明队列，可以用工厂类QueueBuilder构建
+- Exchange：用于声明交换机，可以用工厂类ExchangeBuilder构建
+- Binding：用于声明队列和交换机的绑定关系，可以用工厂类BindingBuilder构建
+
+**5.1.2.1 基于Bean声明**
+```java
+@Configuration
+public class FanoutConfiguration {
+    //声明FanoutExchange交换机
+    @Bean
+    public FanoutExchange fanoutExchange(){
+        return new FanoutExchange("pptp.fanout");
+    }
+    //声明队列1
+    @Bean
+    public Queue fanoutQueue1(){
+        return new Queue("fanout.queue1");
+    }
+    //绑定队列1与交换机
+    @Bean
+    public Binding bindingQueue1(Queue fanoutQueue1,FanoutExchange fanoutExchange){
+        return BindingBuilder.bind(fanoutQueue1).to(fanoutExchange);
+    }
+}
+
+```
+**5.1.2.2 基于注解声明**
+```java
+@RabbitListener(bindings = @QueueBinding(
+        value = @Queue(name = "direct.queue1",durable = "true"),
+        exchange = @Exchange(name = "pptp.direct",type = ExchangeTypes.DIRECT),
+        key = "123"
+)
+)
+public void listenSimpleQueue2(String msg) throws InterruptedException{
+    System.out.println(msg);
 }
 ```
 
