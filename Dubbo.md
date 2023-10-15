@@ -167,10 +167,16 @@ server:
 
 ---
 
-## 4 
+## 4 Dubbo高级特性
 
 <details>
 <summary> </summary>
+
+### 4.1 dubbo-admin
+- dubbo-admin是图形化的服务管理页面
+- 从注册中心中获取到所有的提供者/消费者进行配置管理
+- 路由规则、动态配置、服务降级、访问控制、权重调整、负载均衡等管理功能
+
 
 
 </details>
