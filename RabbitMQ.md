@@ -36,7 +36,7 @@ MQ全程Message Queue(消息队列)，是在消息的传输过程中保存消息
 
 ---
 
-## 2 RabbitMQ安装以及快速入门
+## 2 RabbitMQ安装
 
 <details>
 <summary> </summary>
@@ -80,14 +80,126 @@ vim /usr/lib/rabbitmq/lib/rabbitmq_server-3.6.5/ebin/rabbit.app
   - 端口默认15672
   - 注意虚拟机防火墙拦截，简单解决方法关闭虚拟机防火墙
 
-
+**解决config file not found**
+将/usr/share/doc/rabbitmq-server-3.6.5/下rabbitmq.config.example复制到/etc/rabbitmq/
+```
+cp /usr/share/doc/rabbitmq-server-3.6.5/rabbitmq.config.example /etc/rabbitmq/rabbitmq.config
+```
+操作后重启服务即可
 
 
 </details>
 
 ---
 
-## 3 
+## 3 RabbitMQ快速入门
+
+<details>
+<summary> </summary>
+
+- 创建Consumer、Provider模块
+依赖
+```
+<dependency>
+    <groupId>com.rabbitmq</groupId>
+    <artifactId>amqp-client</artifactId>
+    <version>5.14.2</version>
+</dependency>
+```
+**Provider简单模式下**
+```java
+public class ProviderHelloWorld {
+    public static void main(String[] args) throws IOException, TimeoutException {
+        //1.创建连接工厂
+        ConnectionFactory factory=new ConnectionFactory();
+        //2.设置参数
+        factory.setHost("192.168.52.129"); //ip
+        factory.setPort(5672); //port 默认5672
+        factory.setVirtualHost("/itcast");//虚拟机 默认/
+        factory.setUsername("pptp"); //用户名
+        factory.setPassword("pptp"); //密码
+        factory.setHandshakeTimeout(300000000);//设置握手时间 解决超时报错问题
+        //3.创建连接
+        Connection connection = factory.newConnection();
+        //4.创建channel
+        Channel channel=connection.createChannel();
+        //5.创建Queue
+        /**
+         *参数
+         * 1. queue 队列名称
+         * 2. durable 是否持久化，当mq重启后还在
+         * 3. exclusive 是否独占，只能有一个consumer监听。当connection关闭时是否删除队列
+         * 4. autoDelete 是否自动删除
+         * 5. arguments 参数
+         */
+        channel.queueDeclare("helloWorld",true,false,false,null);
+        //6.发送消息
+        /**
+         * 参数
+         * 1. exchange 交换机名称，默认""
+         * 2. routingKey 路由名称
+         * 3. props 配置信息
+         * 4. body 发送的消息数据
+         */
+        String body="hello rbmq";
+        channel.basicPublish("","helloWorld",null,body.getBytes());
+        
+        //7.释放资源
+        channel.close();
+        connection.close();
+    }
+}
+```
+执行成功后页面管理queues结果  
+![](/img/RabbitMQ/result1.png)
+
+**Consumer**
+```java
+public class ConsumerHelloWorld {
+    public static void main(String[] args) throws IOException, TimeoutException {
+        ConnectionFactory factory=new ConnectionFactory();
+        factory.setHost("192.168.52.129"); //ip
+        factory.setPort(5672); //port 默认5672
+        factory.setVirtualHost("/itcast");//虚拟机 默认/
+        factory.setUsername("pptp"); //用户名
+        factory.setPassword("pptp"); //密码
+        factory.setHandshakeTimeout(300000000);//设置握手时间
+        Connection connection = factory.newConnection();
+        Channel channel=connection.createChannel();
+        channel.queueDeclare("helloWorld",true,false,false,null);
+        //接收消息
+        /**
+         * 参数
+         * 1. queue 队列名称
+         * 2. autoAck 是否自动确认
+         * 3. callback 回调对象
+         */
+        Consumer consumer=new DefaultConsumer(channel){
+            //回调方法，当收到消息后会自动执行该方法
+
+            /**
+             * 
+             * @param consumerTag 标识
+             * @param envelope 获取信息
+             * @param properties 配置信息
+             * @param body 数据
+             * @throws IOException
+             */
+            @Override
+            public void handleDelivery(String consumerTag, Envelope envelope, AMQP.BasicProperties properties, byte[] body) throws IOException {
+                System.out.println(body.toString());
+            }
+        };
+        channel.basicConsume("helloWorld",true, consumer);
+    }
+}
+```
+
+</details>
+
+---
+
+## 4 工作模式
 
 <details>
 <summary> </summary>
@@ -99,7 +211,31 @@ vim /usr/lib/rabbitmq/lib/rabbitmq_server-3.6.5/ebin/rabbit.app
 
 ---
 
-## 4 
+## 5 
+
+<details>
+<summary> </summary>
+
+
+
+
+</details>
+
+---
+
+## 6 
+
+<details>
+<summary> </summary>
+
+
+
+
+</details>
+
+---
+
+## 7 
 
 <details>
 <summary> </summary>
