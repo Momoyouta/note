@@ -199,10 +199,88 @@ public class ConsumerHelloWorld {
 
 ---
 
-## 4 工作模式
+## 4 RabbitMQ工作模式
 
 <details>
 <summary> </summary>
+
+### 4.1 Queues工作队列模式
+![](/img/RabbitMQ/work_queues.png)
+- 相比简单模式多了多个消费端，多个消费端共同消费同一个队列中的消息
+- 应用于对于任务过重或任务较多情况，可以提高任务处理速度
+- 代码上与简单模式无异
+
+### 4.2 Pub/Sub订阅模式
+![](/img/RabbitMQ/Pub_Sub.png)
+- 引入了交换机(X)角色
+  - 一方面接受生产者发送的消息，另一方面知道如何处理消息，如递交给某个特定队列。操作取决于Exchange类型:
+    - Fanout：广播，将消息交给所有绑定到交换机的队列
+    - Direct：定向，将消息交给符合指定routingkey的队列
+    - Topic：通配符，把消息交给符合routing pattern的队列
+    - Headers：参数匹配
+- Exchange只负责转发消息，不具备存储消息的能力，因此如果没有任何队列与Exchange绑定，或者没有符合路由规则的队列，那么消息会丢失  
+
+
+#### 4.2.1 Provider
+> 主要增添了创建交换机和绑定步骤
+```java
+public class ProviderPubSub {
+    public static void main(String[] args) throws IOException, TimeoutException {
+        ConnectionFactory factory=new ConnectionFactory();
+        factory.setHost("192.168.52.129"); 
+        factory.setPort(5672); 
+        factory.setVirtualHost("/itcast");
+        factory.setUsername("pptp"); 
+        factory.setPassword("pptp");
+        factory.setHandshakeTimeout(300000000);
+        Connection connection = factory.newConnection();
+        Channel channel=connection.createChannel();
+        //5.创建交换机
+        /**
+         * 参数
+         * 1. exchange 交换机名称
+         * 2. type 交换机类型
+         *      DIRECT：定向
+         *      FANOUT：广播
+         *      TOPIC：通配符放松
+         *      HEADERS：参数匹配
+         * 3. durable：是否持久化
+         * 4. autoDelete：自动删除
+         * 5. internal：内部使用，一般false
+         * 6. arguments：参数
+         */
+        String exchangeName="testFanout";
+        channel.exchangeDeclare(exchangeName, BuiltinExchangeType.FANOUT,true,false,false,null);
+        //6.创建队列
+        String queue1Name="testFanoutQueue1";
+        String queue2Name="testFanoutQueue2";
+        channel.queueDeclare(queue1Name,true,false,false,null);
+        channel.queueDeclare(queue2Name,true,false,false,null);
+        //7.绑定队列和交换机
+        /**
+         * 参数
+         * 1. queue：队列名称
+         * 2. exchange：交换机名称
+         * 3. routingKey：路由键，绑定规则，fanout默认为空字符串
+         */
+        channel.queueBind(queue1Name,exchangeName,"");
+        channel.queueBind(queue2Name,exchangeName,"");
+        //8. 发送消息
+        String body="呵呵";
+        channel.basicPublish(exchangeName,"",null,body.getBytes());
+        //9/释放资源
+        channel.close();
+        connection.close();
+    }
+}
+```
+执行结果可发现两队列各有一条消息
+![](/img/RabbitMQ/result2.png)
+
+#### 4.2.1 Consumer
+消费者代码无异，只需指定消费的队列，如样例种的queue1Name,queue2Name
+
+### 4.3 Routing 路由模式
 
 
 
