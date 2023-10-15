@@ -308,12 +308,65 @@ channel.queueBind(queue2Name,exchangeName,"warning");
 
 ---
 
-## 5 
+## 5 SpringBoot整合RabbitMQ
 
 <details>
 <summary> </summary>
 
+### 5.1 SpringAMQP0
+- 基于AMQP协议定义的一套API规范，提供了模板来发送和接受消息。包含两部分，其中spring-amqp是基础抽象，spring-rabbit是底层的默认实现
 
+**依赖**
+```xml
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-amqp</artifactId>
+</dependency>
+```
+**application配置**
+```yml
+spring:
+  rabbitmq:
+    host:  192.168.52.129 #主机名
+    port:  5672 #端口
+    virtual-host:  /itcast #虚拟主机
+    username:  pptp #用户名
+    password:  pptp #密码
+    #设置连接超时时间,单位ms
+    #解决.concurrent.TimeoutException报错
+    connection-timeout:  0
+
+```
+
+#### 5.1.1 简单样例
+- SpringAMQP提供了RabbitTemplate工具类，方便我们发送消息
+
+**发送消息**
+```java
+@Autowired
+private RabbitTemplate rabbitTemplate;
+
+@Test
+void testSimpleQueue() {
+    //队列名
+    String queueName = "pptp.queue";
+    // 消息
+    String message = "hello rabbitmq";
+    // 发送
+    rabbitTemplate.convertAndSend(queueName,message);
+}
+```
+**接收消息**
+```java
+@Component
+public class SpringRabbitListener {
+
+    @RabbitListener(queues = "pptp.queue") //声明要监听的队列名称
+    public void listenSimpleQueue(String msg){
+        System.out.println(msg);
+    }
+}
+```
 
 
 </details>
