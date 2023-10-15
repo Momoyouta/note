@@ -90,7 +90,7 @@ vim ./conf/zoo.conf
 ./bin/zkServer.sh start
 ```
 
-### 3.2 spring与springmvc整合
+### 3.2 利用springboot3.1.4搭建基本程序
 ![](/img/Dubbo/Structrue.png)
 **步骤**
 - 创建服务提供者Provider模块
@@ -98,8 +98,68 @@ vim ./conf/zoo.conf
 - 在Provider模块编写UserServiceImpl提供服务
 - 在Consumer中的UserController远程调用UserServiceImpl提供的服务
 - 分别启动两个服务，测试
-- 
 
+**dubbo/zookeeper依赖**
+consumer/provider均需要加
+```xml
+<!--Dubbo起步依赖-->
+<dependency>
+    <groupId>org.apache.dubbo</groupId>
+    <artifactId>dubbo</artifactId>
+    <version>3.2.2</version>
+</dependency>
+<dependency>
+    <artifactId>zookeeper</artifactId>
+    <groupId>org.apache.zookeeper</groupId>
+    <version>3.8.1</version>
+</dependency>
+<dependency>
+    <groupId>org.apache.curator</groupId>
+    <artifactId>curator-x-discovery</artifactId>
+    <version>4.2.0</version>
+</dependency>
+```
+#### 3.3 Provider
+**Service改造**
+- 将Service注解更换为dubbo的@DubboService注解  
+将这个类提供的方法对外发布。将访问的地址ip，端口，路径注册到注册中心  
+- 启动类添加@EnableDubbo
+- 修改配置文件
+```yml
+dubbo:
+  #配置模块名称
+  application:
+    name: user-service-provider
+  #配置注册地址，端口默认2181
+  registry:
+    address: zookeeper://192.168.52.129:2181
+  protocol:
+    name:  dubbo
+    port:  20880
+```
+#### 3.4 Consumer
+**Controller改造**
+- @Autowired改为@DubboReference，远程注入
+  - 从zookeeper注册中心获取对象的访问url
+  - 进行远程调用RPC
+  - 将结果封装为一个代理对象，给变量赋值
+- 启动类添加@EnableDubbo
+- 修改配置文件，注意端口修改，防止冲突
+```yml
+dubbo:
+  #配置模块名称
+  application:
+    name: user-web-consumer
+  #配置注册地址，端口默认2181
+  registry:
+    address: zookeeper://192.168.52.129:2181
+  protocol:
+    name:  dubbo
+    port:  20880
+server:
+  port: 8081 #########
+
+```
 </details>
 
 ---
