@@ -298,8 +298,12 @@ channel.queueBind(queue2Name,exchangeName,"warning");
 
 ### 4.4 Topics 通配符模式
 ![](/img/RabbitMQ/Topics.png)
-- 能实现Pub/Sub和Routing模式的功能，至少Topic在配置routingKey时可以使用通配符，更加灵活
-
+- 能实现Pub/Sub和Routing模式的功能，至少Topic在配置routingKey时可以使用通配符，更加灵活  
+通配符规则
+|符号|规则|示例|
+|-|-|-|
+|*|匹配一个单词|`pptp.*`将匹配`pptp.a`、`pptp.b`|
+|#|匹配0个或多个单词|`pptp.#`将匹配`pptp.a.b`、`pptp.b.a`|
 </details>
 
 ---
