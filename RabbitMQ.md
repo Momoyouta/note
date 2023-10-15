@@ -281,9 +281,24 @@ public class ProviderPubSub {
 消费者代码无异，只需指定消费的队列，如样例种的queue1Name,queue2Name
 
 ### 4.3 Routing 路由模式
+![](/img/RabbitMQ/Routing.png)
+- 队列与交换机绑定，需要指定一个RoutingKey
+- 消息的发送方在想交换机发送消息时，也必须指定消息的RoutingKey
+- 交换机不再把消息交给每一个绑定的对象，而是根据RoutingKey判断，只有Key一致的队列才会受到消息
 
+#### 4.3.1 Provider&Consumer
+只需修改交换机的绑定参数即routingKey即可
+例如：
+```java
+channel.queueBind(queue1Name,exchangeName,"error");
+channel.queueBind(queue2Name,exchangeName,"info");
+channel.queueBind(queue2Name,exchangeName,"error");
+channel.queueBind(queue2Name,exchangeName,"warning");
+```
 
-
+### 4.4 Topics 通配符模式
+![](/img/RabbitMQ/Topics.png)
+- 能实现Pub/Sub和Routing模式的功能，至少Topic在配置routingKey时可以使用通配符，更加灵活
 
 </details>
 
