@@ -536,7 +536,174 @@ void testConfirmCallback() {
 
 ---
 
-## 7 
+## 7 MQ可靠性
+
+<details>
+<summary> </summary>
+
+> 在默认情况下，RabbitMQ会将接收到的信息保存在内存中以降低消息收发的延迟。这会导致两个问题：
+> - 一旦MQ宕机，内存中的消息会丢失
+> - 内存空间有限，当消费者故障或处理过慢时，会导致消息积压，引发MQ阻塞  
+>   - 内存上限时MQ会执行Paged Out机制，将消息持久化
+> 
+> 解决方法：
+> - 数据持久化
+> - Lazy Queue
+
+### 7.1 数据持久化
+RabbitMQ实现数据持久化包括三个方面：
+- 交换机持久化 (spring默认持久)
+- 队列持久化 (spring默认持久)
+- 消息持久化 --修改DeliveryMode
+
+### 7.2 Lazy Queue
+在3.12后所有的队列都是LazyQueue模式，无法更改
+**特征**
+- 接收到消息后直接存入磁盘而非内存
+- 消费者要消费消息时才会从磁盘中读取并加载到内存
+- 支持数百万条的消息存储
+
+**实现**
+- 基于@Bean
+```java
+@Bean
+public Queue LazyQueue(){
+    return QueueBuilder
+            .durable("lazy.queue")
+            .lazy()
+            .build();
+}
+```
+- 基于注解
+```java
+@RabbitListener(queuesToDeclare = @Queue(
+        name = "lazy.queue",
+        durable = "true",
+        arguments = @Argument(name = "x-queue-mode",value = "lazy")
+))
+public void listenLazyQueue(String msg){
+    log.info("接收到：{}",msg);
+}
+```
+
+</details>
+
+---
+
+## 8 消费者可靠性
+
+<details>
+<summary> </summary>
+
+### 8.1 消费者确认机制
+为了确认消费者是否成功处理消息，RabbitMQ提供了消费者确认机制。当消费者处理消息结束后，应该向RabbitMQ发送一个回执，告知RabbitMQ自己消息处理状态。回执有三种可选值：
+- ACK：成功处理消息，RabbitMQ从队列中删除该消息
+- NACK：消息处理失败，RabbitMQ需要再次投递消息
+- Reject：消息处理失败并拒绝该消息，RabbitMQ从队列中删除该消息  
+- 
+SpringAMQP已经实现了消息确认功能，并允许我们通过配置文件选择ACK处理方式，有三种方式：
+- none：不处理。即消息投递给消费者后立刻ack，消息会立刻从MQ删除。非常不安全
+- manual：手动模式。需要自己在业务代码中调用api，发送ack或reject，存在业务入侵，但更灵活
+- auto：自动模式。SpringAMQP利用AOP对我们的消息处理逻辑做了环绕增强，当业务正常执行时则自动返回ack，业务出现异常，根据异常判断返回不同结果；
+  - 业务异常，返回nack
+  - 消息处理异常或校验异常，返回reject
+
+**实现**  
+修改配置
+```yml
+spring:
+  rabbitmq:
+    listener:
+      simple:
+        prefetch: 1
+        acknowledge-mode: none #none 关闭；manual，手动ack；auto，自动ack
+```
+
+### 8.2 失败重试机制
+当消费者出现异常后，消息会不断requeue(重新入队)到队列，再重新发送给消费者，然后再次异常，再次requeue，无限循环，导致mq的消息处理飙升，带来不必要的压力。我们可利用Spring的retry机制，在消费者出现异常时利用本地重试，而不是无限制的requeue到mq队列  
+
+
+**配置**
+```yml
+spring:
+  rabbitmq:
+    listener:
+      simple:
+        prefetch: 1
+        retry:
+          enabled: true #开启消费者失败重试
+          initial-interval: 1000ms #初始的失败等待时长为1s
+          multiplier: 1
+          max-attempts: 3
+          stateless: true #true 无状态；false有状态。如果业务中包含事务，这里改为false
+```
+
+### 8.3 失败消息处理策略
+在开启重试模式后，重试次数耗尽，如果消息依然失败，则需要有MessageRecoverer接口处理，它包含三种不同实现：
+- RejectAndDontRequeueRecoverer：重试耗尽后，直接reject，丢弃消息。默认方式
+- ImmediateRequeueMessageRecoverer：重试耗尽后，返回nack，消息重新入队
+- RepublisherMessageRecoverer：重试耗尽后，将失败消息投递到指定的交换机
+
+**RepublisherMessageRecoverer**  
+将失败策略改为RepublisherMessageRecoverer：
+1. 定义接收失败消息的交换机、队列及其绑定关系
+2. 定义RepublisherMessageRecoverer:  
+   ```java
+    @Configuration
+    @ConditionalOnProperty(prefix = "spring.rabbitmq.listener.simple.retry",name = "enabled",havingValue = "true") //配置开启才启用
+    public class ErrorConfiguration {
+        @Bean
+        public MessageRecoverer messageRecoverer(RabbitTemplate rabbitTemplate){
+            return new RepublishMessageRecoverer(rabbitTemplate,"error.exchange","error");
+        }
+    }
+   ```
+
+### 8.4 业务幂等性
+> 指同一个业务，执行一次或多次对业务状态的影响是一致的
+
+#### 8.4.1 解决重复消息
+
+**方案一  唯一消息id**  
+给每个消息设置一个唯一id，利用id区分是否是重复消息：
+- 每一条消息都生成一个唯一的id，与消息一起投递给消费者
+- 消费者接收到消息后处理自己的业务，业务处理成功后将消息ID保存到数据库
+- 如果下次又收到相同消息，去数据库查询判断是否存在，存在则为重复消息放弃处理  
+
+```java
+//consumer中利用消息转换器添加
+@Bean
+public MessageConverter jacksonMessageConverter(){
+    //1. 定义消息转换器
+    Jackson2JsonMessageConverter jjmc = new Jackson2JsonMessageConverter();
+    //2. 配置自动创建消息id，用于识别不同消息，也可以在业务中基于ID判断是否为重复消息
+    jjmc.setCreateMessageIds(true);
+    return jjmc;
+}
+```
+
+**方案二  业务判断**  
+结合业务逻辑，基于业务本身做判断。例如：我们要在支付后修改订单状态为已支付，应该在修改订单状态前先查询订单状态，判断状态是否是未支付。只有未支付订单才需要修改，其他不做处理
+
+
+
+</details>
+
+---
+
+## 9 
+
+<details>
+<summary> </summary>
+
+
+
+
+</details>
+
+---
+
+##  
 
 <details>
 <summary> </summary>
