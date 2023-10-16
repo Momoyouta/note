@@ -412,18 +412,125 @@ public void listenSimpleQueue2(String msg) throws InterruptedException{
 }
 ```
 
+### 5.2 消息转换器
+- spring的对消息对象的处理是由org.springframework.amqp.support.converter.MessageConverter来处理的，而默认实现是SimpleMessageConverter，基于JDK的ObjectOutputStream完成序列化，存在下列问题：
+  - JDK的序列化有安全风险
+  - JDK序列化的消息太大
+  - JDK序列化消息的可读性差
+- 建议使用JSON序列化
+```xml
+<dependency>
+    <groupId>com.fasterxml.jackson.core</groupId>
+    <artifactId>jackson-databind</artifactId>
+</dependency>
+```
+添加配置bean
+```java
+@Bean
+public MessageConverter jacksonMessageConverter(){
+    return new Jackson2JsonMessageConverter();
+}
+```
 
 </details>
 
 ---
 
-## 6 
+## 6 生产者可靠性
 
 <details>
 <summary> </summary>
 
+### 6.1 生产者重连
+> 有时候由于网络波动，可能会出现客户端连接MQ失败情况，通过配置我们可以开启连接失败后的重连机制
+```yml
+spring:
+  rabbitmq:
+    connection-timeout:  0 #设置连接超时时间 0代表等待至连接成功
+    template:
+      retry:
+        enabled: true #开启超时重试机制
+        initial-interval: 1000ms #失败后的初始等待时间
+        multiplier: 1 #失败后下次等待时长的倍数，下次等待时长 = initial-interval * multiplier
+        max-attempts: 3 #最大重试次数
+```
 
+### 6.2 生产者确认
+> RabbitMQ提供了Publisher Confirm和ublisher Return两种确认机制。开启后MQ成功收到消息后会返回确认消息给生产者，结果有以下几种：
+> - 消息投递到了MQ，但路由失败。此时会通过PublisherReturn返回路由异常原因，然后返回ACK，告知投递成功
+> - 临时消息投递到了MQ，并且入队成功，返回ACK
+> - 持久消息投递到了MQ，并且入队完成持久化，返回ACK
+> - 其他情况返回NACK
 
+### 6.3 实现
+publisher中添加配置
+```yml
+spring:
+  rabbitmq:
+    publisher-confirm-type: correlated #开启publisher confirm机制 
+    # tpye：
+    #1. none：关闭confirm机制
+    #2. simple：同步阻塞等待MQ的回执消息
+    #3. correlated：MQ异步回调方式返回回执消息
+    publisher-returns: true #开启publisher return机制
+```
+
+#### 6.3.1 ReturnCallback
+```java
+@Slf4j
+@Configuration
+public class MqConfirmConfig implements ApplicationContextAware {
+    @Override
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+        RabbitTemplate rabbitTemplate=applicationContext.getBean(RabbitTemplate.class);
+        //配置回调
+        rabbitTemplate.setReturnsCallback(new RabbitTemplate.ReturnsCallback() {
+            @Override
+            public void returnedMessage(ReturnedMessage returnedMessage) {
+                log.debug("收到消息的return callback,exchange:{},key:{},msg:{},code:{},text:{}",
+                        returnedMessage.getExchange(),returnedMessage.getRoutingKey(),returnedMessage.getMessage(),
+                        returnedMessage.getReplyCode(),returnedMessage.getReplyText()
+                );
+            }
+        });
+    }
+}
+```
+
+#### 6.3.2 ConfirmCallback
+```java
+@Test
+void testConfirmCallback() {
+    //1.创建cd
+    CorrelationData cd = new CorrelationData(UUID.randomUUID().toString());
+    //2.添加ConfirmCallback
+    cd.getFuture().addCallback(new ListenableFutureCallback<CorrelationData.Confirm>() {
+        @Override
+        public void onFailure(Throwable ex) {
+            log.error("消息回调失败(spring问题",ex);
+        }
+
+        @Override
+        public void onSuccess(CorrelationData.Confirm result) {
+            log.debug("收到confirm callback回执");
+            if(result.isAck()){
+                log.debug("消息发送成功，收到ACK");
+            }
+            else{
+                log.error("消息发送失败，收到NACK，原因：{}",result.getReason());
+            }
+        }
+    });
+    Map<String,Object> msg=new HashMap<>();
+    msg.put("name","jack");
+    rabbitTemplate.convertAndSend("pptp.direct","123",msg,cd);
+    try {
+        Thread.sleep(100000); //等待回调
+    } catch (InterruptedException e) {
+        throw new RuntimeException(e);
+    }
+}
+```
 
 </details>
 
