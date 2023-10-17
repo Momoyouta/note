@@ -691,11 +691,51 @@ public MessageConverter jacksonMessageConverter(){
 
 ---
 
-## 9 
+## 9 延迟消息
 
 <details>
 <summary> </summary>
+> 延迟消息：生产者发送消息时指定一个时间，消费者不会立刻收到消息而是在指定时间后才收到  
+> 延迟任务：设置在一定时间后才执行的任务
 
+
+### 9.1 死信交换机
+当队列中的消息满足下列情况之一时，就会成为死信(dead letter)
+- 消费者使用basic.reject或basic.nack声明消费失败，并且消息的requeue参数设置为false
+- 消息是一个过期消息(达到了队列或消息本身设置的过期时间)，超时无人消费
+- 要投递的队列消息堆积满了，最早的消息可能成为死信  
+
+如果队列通过dead-letter-exchange属性指定了一个交换机，那么该队列中的死信就会投递到这个交换机中，这个交换机称为死信交换机(DLX)
+![](/img/RabbitMQ/DLX.png)
+- 发送限时消息
+  ```java
+  @Test
+  void testTTLMessage() {
+    String exchangeName ="pptp.direct";
+    Message message = MessageBuilder
+            .withBody("hello".getBytes(StandardCharsets.UTF_8))
+            .setExpiration("3000").build();
+    rabbitTemplate.convertAndSend(exchangeName,"123",message);
+  }
+  ```
+
+### 9.2 延迟消息插件
+> 该插件设计了一种支持延迟消息功能的交换机，当消息投递到交换机后可以暂存一定时间，到> 期后再投递到队列
+
+[下载地址](https://github.com/rabbitmq/rabbitmq-delayed-message-exchange/releases)
+
+**实现**  
+- 交换机上添加属性delayed
+```java
+//注解
+@Exchange(name="delay.direct",delayed = "true")
+//Bean
+ExchangeBuilder.delayed()....
+```
+- 发送消息
+```java
+MessageBuilder.setDelay(ms)...
+```
 
 
 
