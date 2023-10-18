@@ -215,7 +215,7 @@ dubbo-admin-develop目录下打开powershell，执行`mvn clean package`
 - 使用timeout属性配置超时时间，默认值1000，单位ms
   ```java
   @DubboService(timeout = 3000,retries = 2)//retries，重试次数
-  @Reference(timeout = 1000)//若两方都配，消费放消费，建议配在服务提供方
+  @DubboReference(timeout = 1000)//若两方都配，消费放消费，建议配在服务提供方
   ```
 
 ### 5.3 多版本
@@ -223,16 +223,46 @@ dubbo-admin-develop目录下打开powershell，执行`mvn clean package`
 - dubbo中使用version属性来设置和调用同一个接口的不同版本
   ```java
   @DubboService(version = "v1.0")
-  @Reference(version = "v1.0")//远程注入
+  @DubboReference(version = "v1.0")//远程注入
   ```
 
+### 5.4 负载均衡
+- dubbo负载均衡策略:
+  - Random：按权重设置随机概率
+    ```java
+    @DubboService(weight = x)
+    ```
+  - RoundRobin：按权重轮询
+  - LeastActive：按最少活跃调用数，相同活跃数的随机
+  - ConsistenHash：一致性Hash，相同参数的请求总是发到同一提供者
 
+**实现**
+```java
+@DubboReference(loadbalance = "type")
+```
+
+### 5.5 集群容错
+- 集群容错模式：
+  - Failover Cluster：失败重试。当出现失败，重试其他服务器，默认重试两次，使用retries配置，一般用于读操作
+  - Failfast Cluster：快速失败，只发起一次调用，失败立即报错，一般用于写操作
+  - Failsafe Cluster：失败安全，出现异常时，直接忽略，返回一个空结果
+  - Failback Cluster：失败自动恢复，后台记录失败请求，定时重发
+  - Forking Clust：并行调用多个服务器，只要成功一个就返回
+  - Broadcast Clust：广播调用所有提供者，逐个调用，任意一台报错则报错
+
+### 5.6 服务降级
+> 当服务压力过大时，考虑关闭部分服务释放资源，保证核心业务服务运行
+
+- 服务降级方式：
+  - `mock=force:return null` 表示消费方对该服务的方法调用都直接返回null值，不发起远程调用，用来屏蔽不重要服务不可用时对调用方的影响
+  - `mock=fail:return null` 表示消费方对该服务的方法调用在失败后，再返回null值，不抛异常。用来容忍不重要服务不稳定时对调用方的影响
+  - 
 
 </details>
 
 ---
 
-## 6 
+## 
 
 <details>
 <summary> </summary>
@@ -242,50 +272,3 @@ dubbo-admin-develop目录下打开powershell，执行`mvn clean package`
 
 </details>
 
----
-
-##  
-
-<details>
-<summary> </summary>
-
-
-
-
-</details>
-
----
-
-##  
-
-<details>
-<summary> </summary>
-
-
-
-
-</details>
-
----
-
-##  
-
-<details>
-<summary> </summary>
-
-
-
-
-</details>
-
----
-
-##  
-
-<details>
-<summary> </summary>
-
-
-
-
-</details>
