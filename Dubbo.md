@@ -167,15 +167,124 @@ server:
 
 ---
 
-## 4 Dubbo高级特性
+## 4 dubbo-admin
 
 <details>
 <summary> </summary>
 
-### 4.1 dubbo-admin
 - dubbo-admin是图形化的服务管理页面
 - 从注册中心中获取到所有的提供者/消费者进行配置管理
 - 路由规则、动态配置、服务降级、访问控制、权重调整、负载均衡等管理功能
+> dubbo-admin是一个前后端分离的项目，前端使用vue，后端使用springboot。安装dubbo-admin实际上就是部署该项目  
+
+[下载地址](https://github.com/apache/dubbo-admin)
+
+**修改配置**
+dubbo-admin-develop\dubbo-admin-develop\dubbo-admin-server\src\main\resources下application文件
+```
+admin.registry.address=zookeeper://127.0.0.1:2181 //修改为自己注册中心ip
+admin.config-center=zookeeper://127.0.0.1:2181
+admin.metadata-report.address=zookeeper://127.0.0.1:2181
+```
+**部署**
+dubbo-admin-develop目录下打开powershell，执行`mvn clean package`
+
+
+
+
+</details>
+
+---
+
+## 5 高级特性
+
+<details>
+<summary> </summary>
+
+### 5.1 地址缓存
+> 服务中心挂了，服务是否可以正常访问？可以。
+
+- dubbo服务消费者再第一次调用时，会将服务提供方地址缓存到本地，以后再调用则不会访问注册中心
+- 当服务提供者地址发生变化时，注册中心会通知服务消费者
+
+### 5.2 超时与重试
+
+- 服务消费者在调用服务提供者时发生了阻塞、等待的情形，这个时候，服务消费者会一直等待下去
+- 在某个峰值时，大量的请求都在同时请求服务消费者，会造成线程的大量堆积，势必会造成雪崩
+- dubbo利用超时机制来解决，设置一个超时时间，在这个时间段内，无法完成服务访问，则自动端口连接
+- 使用timeout属性配置超时时间，默认值1000，单位ms
+  ```java
+  @DubboService(timeout = 3000,retries = 2)//retries，重试次数
+  @Reference(timeout = 1000)//若两方都配，消费放消费，建议配在服务提供方
+  ```
+
+### 5.3 多版本
+- 灰度发布：当出现新功能时，会让一部分用户先使用新功能，用户反馈没问题时，再将所有用户迁移到新功能
+- dubbo中使用version属性来设置和调用同一个接口的不同版本
+  ```java
+  @DubboService(version = "v1.0")
+  @Reference(version = "v1.0")//远程注入
+  ```
+
+
+
+</details>
+
+---
+
+## 6 
+
+<details>
+<summary> </summary>
+
+
+
+
+</details>
+
+---
+
+##  
+
+<details>
+<summary> </summary>
+
+
+
+
+</details>
+
+---
+
+##  
+
+<details>
+<summary> </summary>
+
+
+
+
+</details>
+
+---
+
+##  
+
+<details>
+<summary> </summary>
+
+
+
+
+</details>
+
+---
+
+##  
+
+<details>
+<summary> </summary>
+
 
 
 
