@@ -244,6 +244,7 @@ public class RedisConfiguration {
 对数据库操作借用该工具类方法即可
 ![](/img/Redis/redisTemplate.png)
 
+
 **StringRedisTemplate**
 将key与value序列化成String类型
 - 对于对象序列化以及反序列化需要手动进行
@@ -263,6 +264,47 @@ public class RedisConfiguration {
 
 </details>
 
+
+---
+
+## IV.事务和锁机制
+
+<details>
+<summary> </summary>
+
+> - Redis事务是一个单独的隔离操作：事物中的所有命令都会序列化、按顺序地执行。事务在执行的过程中，不会被其他客户端发送来的命令请求打断
+> - Redis事务的主要作用就是串联多个命令防止别的命令插队
+
+### 4.1 Multi、Exec、discard
+从输入`Multi`开始，输入的命令都会依次进入命令队列中，但不会执行，直到输入`Exec`，redis会将之前的命令队列中的命令依次执行。组队的过程中可以通过`discard`来放弃组队
+![图片均来源于尚硅谷](/img/Redis/Multi.png)
+
+### 4.2 事务错误处理
+- 组队中某个命令出现了报告错误，执行时整个的所有队列都会被取消
+- 如果执行阶段某个命令出现了错误，则只有报错的命令不会被执行，而其他命令都会执行，不会回滚
+
+### 4.3 事务冲突问题
+![](/img/Redis/task_question.png)
+
+#### 4.3.1 悲观锁
+- 每次去拿数据时都认为别人会修改，所以每次在拿到数据的时候都会上锁，这样别人想拿这个数据就会block，直到它拿到锁。
+![](/img/Redis/Pessimistic_lock.png)
+
+#### 4.3.2 乐观锁
+- 每次拿数据时候都认为别人不会修改，所以不会上锁，但在更新的时候判断一下在此期间有没有去更新这个数据，可以使用版本号等机制
+- 乐观锁适用于多读的应用类型，这样可以提高吞吐量
+- Redis就是利用这种check-and-set机制实现事务的
+![](/img/Redis/Optimis_lock.png)
+
+
+</details>
+
+---
+
+<details>
+<summary> </summary>
+
+</details>
 
 ---
 
