@@ -326,6 +326,60 @@ public class RedisConfiguration {
 
 ---
 
+## V.持久化
+
+<details>
+<summary> </summary>
+
+### 5.1 Redis DataBase
+> - RDB：在指定的时间间隔内将内存中的数据集快照写入磁盘，也就是行话讲的Snapshot快照，它恢复时是将快照文件直接读到内存里
+> - Redis会单独fork一个子进程来进行持久化(写时复制技术)，会先将数据写入到一个临时文件中，待持久化过程都结束了，再调用这个临时文件替换上次持久化好的文件。整个过程中主进程不进行任何IO操作，这确保了极高的性能。
+> - RDB的缺点是最后一次持久化后数据可能丢失
+
+#### 5.1.1 dump.rdb文件
+**修改存储路径**
+- redis.conf下修改snapshot中的dir
+- 默认存在redis启动目录下
+
+**关闭写入磁盘**  
+snapshow下
+`stop-writes-on-bgsave-error yes/no`
+
+**save**  
+设置指定时间内触发持久化阈值如：
+```
+save 600 10
+//表示十分钟内key改变不少于10，则进行持久化操作，更推荐使用redis自动持久化bgsave
+```
+
+### 5.2 Append Only File
+> 以日志的形式来记录每个写操作(增量保存)，将Redis执行过的所有写指令记录下来(读操作不记录)，只许追加文件但不可以改写文件，redis启动之初会读取该文件重新构建数据，换言之，redis重启的话就根据日志文件的内容将写指令从前到后执行一次
+
+- AOF默认不开启，可在redis.conf中配置文件名称，默认为appendonly.aof
+- AOF文件的保存路径与RDB一致
+- AOF与RDB同时开启，系统默认取AOF的数据(数据不存在丢失)
+- 当文件损坏时可以通过bin目录下`redis-check-aof --fix file`修复
+
+#### 5.2.1 AOF同步频率设置
+- appendfsyns value
+  - always：始终同步，每次Redis的写入都会立刻记入日志。性能较差但数据完整性比较好
+  - everysec：每秒同步，每秒计入日志一次，如果宕机，本秒数据可能丢失
+  - no：redis不主动进行同步，把同步时机交给操作系统
+
+#### 5.2.2 Rewrite压缩
+- AOF采用文件追加的方式，文件会越来越大，为避免出现此种情况，新增了重写机制，当AOF文件大小超过设定阈值时，Redis就会启动AOF文件的内容压缩，只保留可以恢复数据的最小指令集
+- 重写原理：将rdb的快照以二进制的形式附在新的aof头部作为已有的历史数据
+- 重写流程：类似RDB，利用写时复制技术
+- `auto-aof-rewrite-percentage`：设置重写的基准值，文件达到原文件(1+value)%时开始重写
+- `auto-aof-rewrite-min-size`：设置重写基准值,最小文件大小，单位MB,达到这个值开始重写
+
+
+</details>
+
+---
+
+## VI.主从复制
+
 <details>
 <summary> </summary>
 
@@ -337,4 +391,21 @@ public class RedisConfiguration {
 <summary> </summary>
 
 </details>
+
+
+---
+
+<details>
+<summary> </summary>
+
+</details>
+
+
+---
+
+<details>
+<summary> </summary>
+
+</details>
+
 
