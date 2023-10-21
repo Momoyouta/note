@@ -425,48 +425,78 @@ save 600 10
   ```
   docker pull redis
   ```
+- 创建节点挂载目录
+  ```
+  mkdir -p /myredis/redis6379/conf \ &
+  mkdir -p /myredis/redis6379/data \ &
+  mkdir -p /myredis/redis6380/conf \ &
+  mkdir -p /myredis/redis6380/data \ &
+  mkdir -p /myredis/redis6381/conf \ &
+  mkdir -p /myredis/redis6381/data
+  ```
+- 获取主节点ip
+  ```
+  docker inspect redis6379
+  ```
+- 添加并配置redis.conf
+  ```
+  vim /myredis/redis6379/conf/redis.conf
+  ...
+  #####
+  bind 0.0.0.0
+  protected-mode no
+  replicaof 172.17.0.2 6379 #主节点不需要
+  ```
 - 启动容器
   ```
+  docker run -d \
+  -p 6399:6399 \
+  --name redis6399 \
+  --privileged=true \
+  -v /myredis/redis6399/conf/redis.conf:/etc/redis/redis.conf \
+  -v /myredis/redis6399/data:/data \
+  redis \
+  redis-server /etc/redis/redis.conf
   #主
-  docker run -p 16379:6379 \
-  --name redis-master \
-  -v /redis/master/data/:/data \
-  -v /redis/master/redis.conf:/etc/redis/redis.conf \
-  -d redis redis-server /etc/redis/redis.conf 
+  docker run -d \
+  -p 6379:6379 \
+  --name redis6379 \
+  --privileged=true \
+  -v /myredis/redis6379/conf/redis.conf:/etc/redis/redis.conf \
+  -v /myredis/redis6379/data:/data \
+  redis \
+  redis-server /etc/redis/redis.conf
+
   #从1
-  docker run -p 26379:6380 \
-  --name redis-slaver1 \
-  -v /redis/slaver1/data/:/data \
-  -v /redis/slaver1/redis.conf:/etc/redis/redis.conf \
-  -d redis redis-server /etc/redis/redis.conf 
+  docker run -d \
+  -p 6380:6380 \
+  --name redis6380 \
+  --privileged=true \
+  -v /myredis/redis6380/conf/redis.conf:/etc/redis/redis.conf \
+  -v /myredis/redis6380/data:/data \
+  redis \
+  redis-server /etc/redis/redis.conf
+
   #从2
-  docker run -p 36379:6381 \
-  --name redis-slaver2 \
-  -v /redis/slaver2/data/:/data \
-  -v /redis/slaver2/redis.conf:/etc/redis/redis.conf \
-  -d redis redis-server /etc/redis/redis.conf 
-  ```
-- 获取容器ip
-  ```
-  docker inspect redis-master
-  ```
-- 进入容器
-  ```
-  docker exec -it redis-slaver2 redis-cli
+  docker run -d \
+  -p 6381:6381 \
+  --name redis6381 \
+  --privileged=true \
+  -v /myredis/redis6381/conf/redis.conf:/etc/redis/redis.conf \
+  -v /myredis/redis6381/data:/data \
+  redis \
+  redis-server /etc/redis/redis.conf
   ```
 
-- 配置从属
+- 进入容器
   ```
-  slaver 
+  docker exec -it redis6379 redis-cli
   ```
+
 - 查看信息
   ```
-    127.0.0.1:6379> role
-    1) "slave"
-    2) "172.17.0.2" <---可以发现ip属于主节点
-    3) (integer) 6379
-    4) "connected"
-    5) (integer) 42
+    127.0.0.1:6379> info
+    可以看到绑定有两个slaver
   ```
 可进入主节点创建数据再进去从节点查看key验证搭建是否成功
 
