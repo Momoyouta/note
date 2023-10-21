@@ -383,6 +383,93 @@ save 600 10
 <details>
 <summary> </summary>
 
+**概念**  
+主机数据更新后根据配置和策略，自动同步到备机的master/slaver机制，Master以写为主，Slave以读为主
+![](/img/Redis/Master_slaver.png)
+
+**特点**  
+- 读写分离
+- 容灾快速恢复
+- 一主多从
+### 6.1 搭建
+- 创建/myredis文件夹
+- 复制redis.conf配置文件到文件夹中
+- 配置一主两从，创建三个配置文件
+  - redis6379.conf
+  - redis6380.conf
+  - redis6381.conf
+- 在三个配置文件中写入内容
+  ```
+  include /myredis/redis.conf
+  pidfile /var/run/redis_6379.pid
+  port 6379
+  dbfilename dump6379.rdb
+  ```
+- 启动
+  ```
+  redis-server redis6379.conf
+  redis-server redis6380.conf
+  redis-server redis6381.conf
+  ```
+- 进入redis查看信息
+  ```
+  info replication
+  ```
+- 配置从属
+  ```
+  slaveof <ip><pory>
+  成为某个实例的从服务器
+  ```
+#### 使用docker搭建
+- 获取redis镜像
+  ```
+  docker pull redis
+  ```
+- 启动容器
+  ```
+  #主
+  docker run -p 16379:6379 \
+  --name redis-master \
+  -v /redis/master/data/:/data \
+  -v /redis/master/redis.conf:/etc/redis/redis.conf \
+  -d redis redis-server /etc/redis/redis.conf 
+  #从1
+  docker run -p 26379:6380 \
+  --name redis-slaver1 \
+  -v /redis/slaver1/data/:/data \
+  -v /redis/slaver1/redis.conf:/etc/redis/redis.conf \
+  -d redis redis-server /etc/redis/redis.conf 
+  #从2
+  docker run -p 36379:6381 \
+  --name redis-slaver2 \
+  -v /redis/slaver2/data/:/data \
+  -v /redis/slaver2/redis.conf:/etc/redis/redis.conf \
+  -d redis redis-server /etc/redis/redis.conf 
+  ```
+- 获取容器ip
+  ```
+  docker inspect redis-master
+  ```
+- 进入容器
+  ```
+  docker exec -it redis-slaver2 redis-cli
+  ```
+
+- 配置从属
+  ```
+  slaver 
+  ```
+- 查看信息
+  ```
+    127.0.0.1:6379> role
+    1) "slave"
+    2) "172.17.0.2" <---可以发现ip属于主节点
+    3) (integer) 6379
+    4) "connected"
+    5) (integer) 42
+  ```
+可进入主节点创建数据再进去从节点查看key验证搭建是否成功
+
 </details>
 
 ---

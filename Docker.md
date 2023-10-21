@@ -19,6 +19,14 @@
 1. `ps` 查询运行中的容器
 2. `exec` 进入容器
 
+### 修改镜像源
+- 使用国外镜像源会导致pull速度极其缓慢，故切换国内镜像源
+- 在/etc/docker/daemon.json中添加参数(没有则创建)
+```
+{
+  "registry-mirrors": ["https://9cpn8tt6.mirror.aliyuncs.com"]
+}
+```
 
 </details>
 
