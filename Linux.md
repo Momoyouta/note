@@ -41,17 +41,7 @@
     - 利用反引号可以输出命令执行后结果，如`echo \`pwd``
     - 重定向符：'>'表示将左侧命令结果覆盖写入指定文件，'>>'则表示追加写入
 16. `tail [-f -num] path` ： 查看文件尾部内容，默认查看10行,-f表示持续追踪，能实时输出新更新内容
-17. `tar [-zcxvf] fileName [files]`：打包压缩解压命令
-- .tar表示完成了打包但没有压缩
-- .tar.gz表示打包的同时还进行了压缩
-| 选项 | 作用                                                      |
-| ---- | --------------------------------------------------------- |
-| -z   | z代表gizp，通过gizp命令处理文件，gzip可以对文件压缩或解压 |
-| -c   | c代表create，创建新的包文件                               |
-| -x   | x代表extract，实现从包文件中还原文件                      |
-| -v   | v代表verbose，显示命令的执行过程                          |
-| -f   | f代表的是file，用于指定包文件的名称                       |
-18. `history` 查询历史执行命令
+17. `history` 查询历史执行命令
 
 
 </details>
@@ -231,7 +221,121 @@ sudo ln -s /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
 <details>
 <summary> </summary>
 
+### ping命令
+- 可以通过ping命令，检查指定的网络服务器是否是可联通状态
+- `ping [-c num] ip或主机名`
+  - -c 检查的次数，若不使用则无限次持续检查
 
+### wget命令
+- wget是非交互式的文件下载器，可以在命令行内下载网络文件
+- `wget [-b] url` 
+  - -b，后台下载，会将日志写入到当前工作目录的wget-log文件
+  - url，下载链接
+
+### curl命令
+- curl可以发送http网络请求，可用于下载文件、获取信息等
+- `curl [-O] url`
+  - -O，用于下载文件
+- 
+
+</details>
+
+---
+
+## VIII.端口
+
+<details>
+<summary> </summary>
+
+端口，是设备与外界通讯交流的出入口。端口可以分为物理端口和虚拟端口
+- 物理端口：又可称之为接口，是可见的端口，如USB、HDMI端口等
+- 虚拟端口：是指计算机内部的端口，是用来操作系统和外部进行交互使用的
+- 计算机程序之间的通信，通过IP只能锁定计算机，但无法锁定具体的程序，通过端口可以锁定计算机上具体的程序
+
+Linux系统可以支持65535个端口，分3类使用
+- 公认端口：1-1023，通常用于一些系统内置或知名程序的预留使用，如SSH服务的22端口，HTTPS服务的443端口，非特殊需要切勿使用
+- 注册端口：1024~49151，通常可以随意使用，用于松散的绑定一些程序、服务
+- 动态端口：49152~65535，通常不会固定绑定程序而是当程序对外进行网络链接时临时使用
+
+### 查看端口占用
+- 可以通过nmap命令查看
+- 安装nmap
+  ```
+  yum -y install nmap
+  ```
+- 可以通过netstat命令，查看指定端口的占用情况
+- `netstat -anp | grep 端口号`
+- 安装netstat
+  ```
+  yum -y install net-tools
+  ```
+
+
+</details>
+
+---
+
+##  IX.进程管理
+
+<details>
+<summary> </summary>
+
+
+
+</details>
+
+
+---
+
+## X.主机状态监控
+
+<details>
+<summary> </summary>
+
+
+
+</details>
+
+
+---
+
+## XI.环境变量
+
+<details>
+<summary> </summary>
+
+
+
+</details>
+
+---
+
+## XII.Linux文件的上传和下载
+
+<details>
+<summary> </summary>
+
+
+
+</details>
+
+---
+
+## XIII.压缩和解压
+
+<details>
+<summary> </summary>
+
+- `tar [-zcxvf] fileName [files]`：打包压缩解压命令
+- .tar表示完成了打包但没有压缩
+- .tar.gz表示打包的同时还进行了压缩
+| 选项 | 作用                                                      |
+| ---- | --------------------------------------------------------- |
+| -z   | z代表gizp，通过gizp命令处理文件，gzip可以对文件压缩或解压 |
+| -c   | c代表create，创建新的包文件                               |
+| -x   | x代表extract，实现从包文件中还原文件                      |
+| -v   | v代表verbose，显示命令的执行过程                          |
+| -f   | f代表的是file，用于指定包文件的名称                       |
 
 </details>
 
@@ -245,39 +349,3 @@ sudo ln -s /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
 
 
 </details>
-
----
-
-##  
-
-<details>
-<summary> </summary>
-
-
-
-</details>
-
-
----
-
-## 
-
-<details>
-<summary> </summary>
-
-
-
-</details>
-
-
----
-
-## 
-
-<details>
-<summary> </summary>
-
-
-
-</details>
-
