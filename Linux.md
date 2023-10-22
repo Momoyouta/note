@@ -175,43 +175,39 @@ sudo ln -s /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
 
 ---
 
-## 
+## VI.IP与主机
 
 <details>
 <summary> </summary>
 
+### IP
 
+- 通过ifconfig查看ip
+- 特殊ip：
+  - `127.0.0.1` 代指本机
+  - `0.0.0.0`
+    - 可用于代指本机
+    - 可以在端口绑定中用来确定绑定关系
+    - 在一些IP地址限制中，代表所有IP的意思，如放行规则设置则代表允许任意IP访问
 
-</details>
+### 主机名
+- `hostname` 查看主机名
+- `hostnamectl set-hostname 主机名` 修改主机名
 
----
+### 域名解析
+日常访问很少直接输入ip进行访问，而是通过域名(与ip搭建关系)访问服务，
+![](/img/Linux/hosts.png)
+- 先查看本机记录(/etc/hosts)
+- 再联网去DNS服务器
 
-## 
+#### 域名映射配置
+只需去修改hosts文件即可
+```
+127.0.0.1 bgon
 
-<details>
-<summary> </summary>
+```
 
-
-
-</details>
-
----
-
-## 
-
-<details>
-<summary> </summary>
-
-
-
-</details>
-
----
-
-##  配置Linux固定ip
-
-<details>
-<summary> </summary>
+###  配置Linux固定ip
 
 - 当前我们虚拟机的linux操作系统，其ip地址是通过DHCP服务获取的
 - DHCP：动态获取IP地址，即每次重启设备后都会获取一次，可能导致IP地址频繁变更
@@ -225,6 +221,39 @@ sudo ln -s /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
     ![](/img/Linux/staticip.png)
 
 - 执行`systemctl restart network`重启网卡即可
+
+</details>
+
+---
+
+## VII.下载和网络请求
+
+<details>
+<summary> </summary>
+
+
+
+</details>
+
+---
+
+## 
+
+<details>
+<summary> </summary>
+
+
+
+</details>
+
+---
+
+##  
+
+<details>
+<summary> </summary>
+
+
 
 </details>
 
