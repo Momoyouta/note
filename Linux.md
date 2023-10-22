@@ -105,7 +105,60 @@
 - 
 </details>
 
+---
+
+## III.
+
 <details>
 <summary> </summary>
 
+### 配置Linux固定ip
+- 当前我们虚拟机的linux操作系统，其ip地址是通过DHCP服务获取的
+- DHCP：动态获取IP地址，即每次重启设备后都会获取一次，可能导致IP地址频繁变更
+
+**步骤**  
+- 在VM Workstation中配置IP地址网关和网段(IP地址的范围)
+  - 虚拟网络编辑器中修改vmnet8子网IP和NAT中网关
+  - 如子网`192.168.52.0`,网关`192.168.52.2`
+- 在Linux系统中手动修改配置文件，固定IP
+  - 修改/etc/sysconfig/network-scripts/ifcfg-ens33
+    ![](/img/Linux/staticip.png)
+
+- 执行`systemctl restart network`重启网卡即可
 </details>
+
+---
+
+## 
+
+<details>
+<summary> </summary>
+
+
+
+</details>
+
+
+---
+
+## 
+
+<details>
+<summary> </summary>
+
+
+
+</details>
+
+
+---
+
+## 
+
+<details>
+<summary> </summary>
+
+
+
+</details>
+
