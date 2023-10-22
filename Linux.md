@@ -51,6 +51,8 @@
 | -x   | x代表extract，实现从包文件中还原文件                      |
 | -v   | v代表verbose，显示命令的执行过程                          |
 | -f   | f代表的是file，用于指定包文件的名称                       |
+18. `history` 查询历史执行命令
+
 
 </details>
 
@@ -107,12 +109,110 @@
 
 ---
 
-## III.
+## III.yum安装
 
 <details>
 <summary> </summary>
 
-### 配置Linux固定ip
+yum：RPM包软件管理器，用于自动化安装配置Linux软件，并可以自动解决依赖问题  
+`yum [-y] [install | remove | search] 软件名称`
+- -y，自动确认，无需手动确认安装或卸载过程
+- yum命令需要root权限、联网
+
+</details>
+
+---
+
+## IV.软链接
+
+<details>
+<summary> </summary>
+
+- 在系统中创建软链接可以将文件、文件夹链接到其它位置,类似windows中的快捷方式 
+- 使用ln命令创建软链接  
+  `ln -s 参数1 参数2`
+  - -s,创建软链接
+  - 参数1：被链接的文件或文件夹
+  - 参数2：要链接去的目的地
+
+
+
+
+</details>
+
+---
+
+## V.日期与时区
+
+<details>
+<summary> </summary>
+
+### date命令
+- 通过date命令查看系统时间  
+  `date [-d] [+格式化字符串]`
+  - -d按照指定的字符串显示日期，一般用于日期计算
+  - 格式化字符串：通过特定的字符串标记，来控制显示的日期格式  
+    |符号|作用|
+    |-|-|
+    |%Y|年|
+    |%y|年份后两位数|
+    |%M|月|
+    |%d|日|
+    |%H|小时|
+    |%M|分钟|
+    |%S|秒|
+    |%s|自1970-01-01 0点到现在的秒数|
+- `date -d "+1 day"` 显示当前日期+一天
+
+### 修改Linux时区
+将系统自动的localtime删除，并将/usr/share/zoneinfo/Asia/Shanghai文件链接为localtime文件即可
+```
+rm -f /etc/localtime
+sudo ln -s /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
+```
+
+</details>
+
+---
+
+## 
+
+<details>
+<summary> </summary>
+
+
+
+</details>
+
+---
+
+## 
+
+<details>
+<summary> </summary>
+
+
+
+</details>
+
+---
+
+## 
+
+<details>
+<summary> </summary>
+
+
+
+</details>
+
+---
+
+##  配置Linux固定ip
+
+<details>
+<summary> </summary>
+
 - 当前我们虚拟机的linux操作系统，其ip地址是通过DHCP服务获取的
 - DHCP：动态获取IP地址，即每次重启设备后都会获取一次，可能导致IP地址频繁变更
 
@@ -125,16 +225,6 @@
     ![](/img/Linux/staticip.png)
 
 - 执行`systemctl restart network`重启网卡即可
-</details>
-
----
-
-## 
-
-<details>
-<summary> </summary>
-
-
 
 </details>
 
