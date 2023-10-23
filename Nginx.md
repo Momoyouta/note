@@ -105,8 +105,14 @@ server {
 <details>
 <summary> </summary>
 
+### 概念
+![](/img/Nginx/reverse-proxy.png)
+[知乎大佬介绍代理模式](https://zhuanlan.zhihu.com/p/464965616)
 
-
+**概括**  
+- 在访问一个网站过程中，浏览器需要通过代理服务器根据域名查到对应ip才能访问网站，而浏览器不知道哪里有浏览器
+- 对于正向代理，相当于要配置代理服务器
+- 对于反向代理，相当于不需要配置代理服务器
 
 </details>
 
