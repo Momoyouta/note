@@ -289,24 +289,27 @@ server {
 
 ```
 
-### 6.3 URLRetrite伪静态配置
+</details>
+
+---
+
+## 7.URLRetrite伪静态配置
+
+<details>
+<summary> </summary>
+
 - proxy_pass上添加rewrite，隐藏真实地址，在转发前重写地址,支持正则表达式
   ```
   rewrite ^/([0-9]+).html$  /index.jsp?pageNum=$1 break;
   proxy_pass xxx;
   ```
 - 实现访问number.html跳转到/index.jsp?pageNum=number
-
-</details>
-
----
-
-## 7.
-
-<details>
-<summary> </summary>
-
-
+- `rewrite <regex> <replacement> [flag]`
+- flag:
+  - last：本条规则匹配完成后，继续向下匹配新的location URI规则
+  - break：本条规则匹配完后终止
+  - redirect：返回302临时重定向，浏览器地址会显示跳转后的URL地址
+  - permanent：返回301永久重定向，浏览器地址会显示跳转后的URL地址
 
 
 </details>
