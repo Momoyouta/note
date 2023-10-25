@@ -316,7 +316,112 @@ server {
 
 ---
 
-## 8.
+## 8.防盗链与http的referer
+
+<details>
+<summary> </summary>
+
+- 防盗链目的是存在nginx服务器上的静态资源只有我们自己使用
+- 浏览器在二次请求后会在请求头上添加referer，表示请求的来源
+- 通过判断referer是否为nginx服务器地址可以实现简单防盗链
+
+**实现**  
+- 修改conf文件中location部分
+  ```yml
+  location ~*/(js|img|css) { 
+      valid_referers 192.168.52.129:8081;
+      if($invalid_referer){ #检测，无效的referer会返回403
+        return 403;
+      }
+      root /usr/share/nginx/html;
+      index index.html index.htm;
+  }
+  ```
+- `valid_referers none | blocked | server_names | strings ..`
+  - none，检测referer头域不存在的情况
+  - blocked，检测referer头域的值被防火墙或者代理服务器删除或伪装的情况
+  - server_names，设置一个或多个URL，检测referer头域的值是否是这些URL中的一个
+
+</details>
+
+---
+
+## 9.高可用
+
+<details>
+<summary> </summary>
+
+- 解决nginx宕机导致服务不可用问题
+- 当一台nginx服务器宕机可用自动切换到另一台
+- 通过keepalived实现
+
+**原理** 
+- keepalived通过生成一个虚拟ip，在nginx前部浮动，用户访问的是虚拟ip，再有虚拟ip指向nginx服务器
+- 每台nginx服务器上都存在keepalived，他们之间能相互通讯，当主机宕机时可通知备用机
+- 通过脚本定时检测nginx是否出错，出错则kill当前服务器的keepalived以告知其他keepalived
+- 通过这种方式实现的高可用，不需要额外部署机器
+
+### 9.1 keepalived
+- 安装  
+```
+yum -y install keepalived
+#docker容器内安装
+#进入容器
+docker exec -it nginx1 bash
+apt-get update
+apt-get install keepalived
+apt-get install vim
+```
+- 配置文件地址
+ ```
+ vim /etc/keepalived/keepalived.conf
+ ```
+- 修改配置文件，主要修改vrrp_instance,router_id
+  ![](/img/Nginx/vip.png)
+- router_id：服务明早
+- intefave：网卡名称，`ip adr` 查询网卡名称
+- authenication：认证配置，同组保持一致即可
+- virtual_ipaddress：虚拟ip，外部访问的ip
+
+
+</details>
+
+---
+
+## 10.加密相关
+
+<details>
+<summary> </summary>
+
+- http协议的缺点：明文，无状态
+- 为了解决数据保密问题，需要对数据进行加密，以密文形式传输  
+
+**对称加密**  
+- 双方使用相同的加密算法，互相加密解密
+- 缺点：密钥管理复杂、安全性风险高、扩展性差、密钥分发困难和无法保证数据完整性和身份验证
+
+**非对称加密**  
+- 加密解密不一致，一个公钥，服务端存有一个私钥
+- 客户端访问服务端时，通过下载的公钥+算法进行加密，服务端通过私钥+算法进行解密
+- 服务端返回数据时通过私钥+算法进行加密，客户端通过公钥+算法进行解密
+- 公钥加密，公钥解不开
+- 但存在拦截者伪装服务端情况，这时就引出CA机构，通过CA证书机制来保证客户端接收到的数据是来自服务端
+![来源于尚硅谷](/img/Nginx/Asymmetric_encryption.png)
+
+
+**CA机构**
+- 在服务端，CA机构会通过服务端提供的资料，认证公钥，通过ca的私钥+算法生成一个证书，要求放在该域名下的某个目录下，ca机构会去访问这个证书，若访问不到说明该服务端不是正确的服务端
+- 在客户端，会接收到证书，证书只能用内置的ca公钥进行解密
+- 在证书传输给客户端过程中，存在拦截者拦截证书并解密获取明文可能，但修改后的数据会无法被客户端解密，因为拦截者不知道ca私钥，无法加密伪装服务端
+- 这也是https原理之一
+![来源于尚硅谷](/img/Nginx/CA.png)
+
+> 图片来源于尚硅谷
+</details>
+
+---
+
+## 11.
 
 <details>
 <summary> </summary>
@@ -328,7 +433,7 @@ server {
 
 ---
 
-## 9.
+## 12.
 
 <details>
 <summary> </summary>
