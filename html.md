@@ -37,7 +37,7 @@
 1. src 图片路径
 2. alt 图像不能显示时表示的文字
 3. title 鼠标放到图像上显示的文字
-4. width 图像宽度
+4. width 图像宽度 //只输入一个会自动按比例缩放
 5. height 图像高度
 6. border 边框粗细
 
@@ -68,7 +68,7 @@ target 值:默认_self 当前窗口打开页面 _blank 创新一个新窗口打�
    - 例:< a href="#t" > xxx < /a >
     < h3 id ="t"> xxx介绍< /h3 >
 ---
-<!-- zwr防伪 -->
+
 ## VI.特殊字符
 
 ![](/img/html/spchar.png)
@@ -129,7 +129,7 @@ target 值:默认_self 当前窗口打开页面 _blank 创新一个新窗口打�
 #### 有序列表
 < ol >表示
 语法同无序列表
-<!-- zwr防伪 -->
+
 #### 自定义列表
 常用于对术语或名词进行解释描述，定义列表的列表项前没有任何项目符号
 < dl >定义列表,< dt >表示名词 < dd >对名次进行解释
@@ -191,12 +191,15 @@ input的value:
 type的value:
 ![](/img/html/input_type_value.png)
 
-<!-- zwr防伪 -->
+**placeholder**
+用于标注选中提示信息  
+
 **< lable >**
 为input元素定义标注，档点击lable文本时，会自动将光标转到对应表单控件上
 ```html
 <lable for="txt">用户名:</lable><input type="text" id="txt">
 ```
+
 
 **< select >**
 下拉列表，节约空间
@@ -211,7 +214,8 @@ type的value:
 1. 在option中添加属性selected="selected"表示默认选中
 
 **< textarea >**
-文本域，可以进行多行文本输入
+文本域，可以进行多行文本输入  
+一般需禁用尺寸改动
 ```html
 <textarea>
     xxx(默认初始文本)
