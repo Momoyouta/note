@@ -45,7 +45,7 @@ git push -f --set-upstream  仓库名 本地分支名:远程分支名
 13. git remote add 仓库名 SSH 连接远程仓库
 14. git remote -vv查看远程仓库
 15. git clone SSH 克隆仓库到本地
-<!-- zwr防伪 -->
+
 #### 指令别名
 
 **作用**
@@ -56,3 +56,11 @@ git push -f --set-upstream  仓库名 本地分支名:远程分支名
 只需在C盘用户文件夹下创建一个.bashrc文件(可在gitBash中用touch ~/.bashrc来创建)，在文件中利用alias修饰来给指令命别名，如：
 ![](/img/git/bashrc.png)
 然后再在当前文件夹中执行source ~/.bashrc即可
+
+
+## 4、将本地文件绑定到远程仓库
+1. 在github上创建一个仓库
+2. 在本地文件执行`git init`进行本地初始化
+3. 执行`git add .` `git commit -m'消息'`将文件提交到本地仓库
+4. 获取远程仓库SSH，通过`git remote add origin SSH`进行绑定
+5. `git push -u origin master(👈默认分支名,仅第一次需要)`进行上传
