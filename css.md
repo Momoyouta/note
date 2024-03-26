@@ -53,6 +53,16 @@ p {color:red;}
 * {color:red;}
 ```
 
+#### 5.属性选择器
+```css
+a[title] {
+
+}/*选出包含title的元素*/
+
+a[title=value]/* 选出title值为value的元素 */
+```
+[更多用法](https://developer.mozilla.org/zh-CN/docs/Web/CSS/Attribute_selectors)
+
 ### 复合选择器
 
 #### 1.后代选择器
