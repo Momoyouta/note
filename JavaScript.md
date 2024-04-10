@@ -616,3 +616,67 @@ function throttle(fun,t){
 
 box.addEventListener('click',throttle(fun,500));
 ```
+
+## XII.ES6-模块化
+- 将一个大的程序文件拆分成许多小文件，然后将小文件组合
+- 优点
+  - 防止命名冲突
+  - 代码复用
+  - 高维护性
+
+### 语法
+- `export`: 用于规定模块的对外接口
+- `import`: 用于输入其他模块提供的功能
+
+```js
+//m1.js
+export let a='123'
+export function b(){
+  ...
+}
+```
+
+```html
+<script type="module">
+  
+  //引入m1.js中的所有暴露元素
+  import * as m1 from "./src/js/m1.js"
+  console.log(m1)
+  //m1中包含所有暴露元素
+</script>
+```
+
+**统一暴露**  
+`export {a,b}`
+
+**默认暴露**  
+```js
+export default {
+  a: '123',
+  b: function(){
+    ...
+  }
+} 
+```
+
+**导入-解构赋值**  
+```html
+<script type="module">
+  import {a,b} from "./src/js/m1.js"
+  import {a as c} from "./src/js/m2.js"
+  //as取别名防止命名冲突
+</script>
+
+```
+
+**模块引入**  
+app.js
+```js
+import * as m1 from "./m1.js"
+import * as m2 from "./m1.js"
+```
+
+index.html
+```html
+<script src="./scr/js/app.js" type="module"></script>
+```
